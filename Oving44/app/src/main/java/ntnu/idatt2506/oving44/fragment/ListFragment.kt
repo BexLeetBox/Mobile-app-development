@@ -27,7 +27,7 @@ class ListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
-        val items = MovieRepository.movies
+        val items = MovieRepository.getMovies(requireContext())
 
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1,
             items.map { it.title })

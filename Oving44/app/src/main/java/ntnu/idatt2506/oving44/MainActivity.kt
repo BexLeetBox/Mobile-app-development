@@ -5,6 +5,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
 import ntnu.idatt2506.oving44.entity.Item
 import ntnu.idatt2506.oving44.fragment.DetailFragment
 import ntnu.idatt2506.oving44.fragment.ListFragment
@@ -12,11 +13,12 @@ import ntnu.idatt2506.oving44.repository.MovieRepository
 
 
 class MainActivity : AppCompatActivity(), ListFragment.OnItemSelectedListener {
-
+    private lateinit var movies: List<Item>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        movies = MovieRepository.getMovies(this)
         // Check if this is the first time we're creating this Activity instance
         if (savedInstanceState == null) {
             setupFragments()
@@ -52,7 +54,7 @@ class MainActivity : AppCompatActivity(), ListFragment.OnItemSelectedListener {
     }
 
     private var currentMovieIndex = 0
-    private val movies = MovieRepository.movies;
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val detailFragment = supportFragmentManager.findFragmentById(R.id.detailFragmentContainer) as? DetailFragment
 
