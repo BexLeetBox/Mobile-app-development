@@ -10,6 +10,7 @@ import android.widget.ListView
 import androidx.fragment.app.Fragment
 import ntnu.idatt2506.oving44.R
 import ntnu.idatt2506.oving44.entity.Item
+import ntnu.idatt2506.oving44.repository.MovieRepository
 
 class ListFragment : Fragment() {
 
@@ -26,22 +27,7 @@ class ListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
-        val items = listOf(
-            Item(
-                "Harry potter",
-                getString(R.string.description_harry_potter),  // This retrieves the description for Harry Potter from strings.xml
-                R.drawable.hp
-            ),
-            Item(
-                "Lord of the rings",
-                getString(R.string.description_lotr),  // This retrieves the description for Lord of the Rings from strings.xml
-                R.drawable.lotr
-            )
-            // ... add more items if needed
-        )
-
-
-
+        val items = MovieRepository.movies
 
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1,
             items.map { it.title })

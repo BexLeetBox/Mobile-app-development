@@ -1,11 +1,14 @@
 package ntnu.idatt2506.oving44
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import ntnu.idatt2506.oving44.entity.Item
 import ntnu.idatt2506.oving44.fragment.DetailFragment
 import ntnu.idatt2506.oving44.fragment.ListFragment
+import ntnu.idatt2506.oving44.repository.MovieRepository
 
 
 class MainActivity : AppCompatActivity(), ListFragment.OnItemSelectedListener {
@@ -36,10 +39,38 @@ class MainActivity : AppCompatActivity(), ListFragment.OnItemSelectedListener {
     }
 
     // This function is called when an item in the list is clicked
-    override fun onItemSelected(selectedItem: Item) {
+    override fun onItemSelected(item: Item) {
         val detailFragment = supportFragmentManager.findFragmentById(R.id.detailFragmentContainer) as? DetailFragment
-        detailFragment?.updateItem(selectedItem)
+        currentMovieIndex = movies.indexOf(item) // Set the current index when an item is clicked.
+        detailFragment?.updateItem(item)
     }
 
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    private var currentMovieIndex = 0
+    private val movies = MovieRepository.movies;
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val detailFragment = supportFragmentManager.findFragmentById(R.id.detailFragmentContainer) as? DetailFragment
+
+        when (item.itemId) {
+            R.id.action_prev -> {
+                if (currentMovieIndex > 0) {
+                    currentMovieIndex--
+                    detailFragment?.updateItem(movies[currentMovieIndex])
+                }
+            }
+            R.id.action_next -> {
+                if (currentMovieIndex < movies.size - 1) {
+                    currentMovieIndex++
+                    detailFragment?.updateItem(movies[currentMovieIndex])
+                }
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
 }
 
