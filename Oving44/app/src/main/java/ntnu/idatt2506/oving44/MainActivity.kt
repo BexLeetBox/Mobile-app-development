@@ -36,15 +36,10 @@ class MainActivity : AppCompatActivity(), ListFragment.OnItemSelectedListener {
     }
 
     // This function is called when an item in the list is clicked
-    override fun onItemSelected(title: String) {
-        // Here we'll update the DetailFragment to display details about the clicked item
-
+    override fun onItemSelected(selectedItem: Item) {
         val detailFragment = supportFragmentManager.findFragmentById(R.id.detailFragmentContainer) as? DetailFragment
-
-        // Now, you would pass the title to the detailFragment. But this assumes your DetailFragment has a function to update its content based on the title.
-        // For this basic setup, let's just assume that your DetailFragment has a function called `updateTitle` that changes some text to display the clicked title.
-
-        detailFragment?.updateTitle(title)
+        detailFragment?.updateItem(selectedItem)
     }
+
 }
 

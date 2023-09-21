@@ -9,14 +9,16 @@
         android:id="@+id/titleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Default Title"/>
+        android:text=""/>
 
     <ImageView
-        android:id="@+id/detailImage"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:scaleType="centerCrop"/>
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="TODO"
+        android:layout_centerInParent="true" />
+
+
 
     <TextView
         android:id="@+id/detailDescription"

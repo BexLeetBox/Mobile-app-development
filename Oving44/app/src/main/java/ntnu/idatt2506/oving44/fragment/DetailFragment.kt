@@ -12,26 +12,26 @@ import ntnu.idatt2506.oving44.entity.Item
 
 class DetailFragment : Fragment() {
 
-    // Declare a TextView to show the selected item title
     private var titleTextView: TextView? = null
+    private var imageView: ImageView? = null  // Add this line
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_detail, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Find the TextView in your fragment layout
         titleTextView = view.findViewById(R.id.titleTextView)
+        imageView = view.findViewById(R.id.imageView)  // Add this line
     }
 
-    // This is the new method to update the displayed title
-    fun updateTitle(title: String) {
-        titleTextView?.text = title
+    fun updateItem(item: Item) {
+        titleTextView?.text = item.title
+        imageView?.setImageResource(item.imageResId)  // Set the image resource
     }
 }
+

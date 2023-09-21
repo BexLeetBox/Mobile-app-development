@@ -8,9 +8,6 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import ntnu.idatt2506.oving44.ItemAdapter
 import ntnu.idatt2506.oving44.R
 import ntnu.idatt2506.oving44.entity.Item
 
@@ -29,21 +26,27 @@ class ListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val items = listOf(
-            "Movie 1",
-            "Movie 2 "
-            // ... add more titles
+            Item("Harry potter", "Description for Movie 1", R.drawable.hp),
+            Item("Lord of the rings", "Description for Book 1", R.drawable.lotr),
+            // ... add more items
         )
 
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, items)
+
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1,
+            items.map { it.title })
+
         view.findViewById<ListView>(R.id.listView).adapter = adapter
 
         view.findViewById<ListView>(R.id.listView).setOnItemClickListener { _, _, position, _ ->
             callback?.onItemSelected(items[position])
+
+
         }
+
     }
 
     interface OnItemSelectedListener {
-        fun onItemSelected(title: String)
+        fun onItemSelected(item: Item)
     }
 
     override fun onAttach(context: Context) {
