@@ -1,0 +1,11 @@
+<resources>
+    <!-- existing default values -->
+    <string name="app_name">Activities</string>
+    <string name ="title_math_activity">Kalkulator</string>
+    <string name="adder">Adder</string>
+    <string name="multiplier">Multipliser</string>
+    <string name="answer">Svar:</string>
+    <string name="upper_limit">Øvre grense:</string>
+    <string name="correct">Riktig!</string>
+    <string name="wrong_answer">Feil. Riktig svar er %d</string>
+</resources>

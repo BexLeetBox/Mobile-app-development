@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- TextViews for numbers -->
+    <TextView
+        android:id="@+id/numberOne"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="3"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/numberTwo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="5"
+        android:textSize="18sp" />
+
+    <!-- TextView for 'Svar:' label -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="@string/answer"
+        android:textSize="16sp" />
+
+    <!-- EditText for user's answer -->
+    <EditText
+        android:id="@+id/userAnswer"
+        android:layout_width="291dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:inputType="number"
+        android:text="8" />
+
+    <!-- TextView for 'Øvre grense:' label -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="@string/upper_limit"
+        android:textSize="16sp" />
+
+    <!-- EditText for upper limit -->
+    <EditText
+        android:id="@+id/upperLimit"
+        android:layout_width="288dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:inputType="number"
+        android:text="10" />
+
+    <!-- Button for addition -->
+    <Button
+        android:id="@+id/addButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="@string/adder" />
+
+    <!-- Button for multiplication -->
+    <Button
+        android:id="@+id/multiplyButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/multiplier" />
+
+</LinearLayout>
