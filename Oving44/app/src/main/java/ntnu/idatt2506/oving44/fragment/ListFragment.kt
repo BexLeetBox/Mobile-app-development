@@ -25,11 +25,22 @@ class ListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
         val items = listOf(
-            Item("Harry potter", "Description for Movie 1", R.drawable.hp),
-            Item("Lord of the rings", "Description for Book 1", R.drawable.lotr),
-            // ... add more items
+            Item(
+                "Harry potter",
+                getString(R.string.description_harry_potter),  // This retrieves the description for Harry Potter from strings.xml
+                R.drawable.hp
+            ),
+            Item(
+                "Lord of the rings",
+                getString(R.string.description_lotr),  // This retrieves the description for Lord of the Rings from strings.xml
+                R.drawable.lotr
+            )
+            // ... add more items if needed
         )
+
+
 
 
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1,

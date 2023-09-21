@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">Oving44</string>
-    <string name="image_description">Description of the image displayed</string>
+    <string name="description_harry_potter">Harry Potter is a series of fantasy novels written by British author J. K. Rowling.
+        The novels chronicle the lives of a young wizard, Harry Potter,
+        and his friends Hermione Granger and Ron Weasley,
+        all of whom are students at Hogwarts School of Witchcraft and Wizardry.</string>
+
+    <string name="description_lotr">The Lord of the Rings is an epic high-fantasy novel written by
+        English author and scholar J. R. R. Tolkien. The story began as a sequel to Tolkien\'s 1937
+        fantasy novel The Hobbit, but eventually developed into a much larger work.</string>
 </resources>
