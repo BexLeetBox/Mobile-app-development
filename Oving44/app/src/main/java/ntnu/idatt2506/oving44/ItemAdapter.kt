@@ -15,8 +15,8 @@ class ItemAdapter(private val items: List<Item>, private val itemClick: (Item) -
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         val item = items[position]
         holder.title.text = item.title
+        holder.image.setImageResource(item.imageResId) // Set image resource based on the item
         holder.itemView.setOnClickListener { itemClick(item) }
-        // Populate other views in the holder, like the ImageView if you have one
     }
 
     override fun getItemCount() = items.size
