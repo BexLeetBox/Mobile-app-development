@@ -12,34 +12,35 @@ import kotlinx.coroutines.withContext
 import ntnu.idatt2506.httpandcoroutines.R
 import ntnu.idatt2506.httpandcoroutines.utils.NetworkUtils
 import ntnu.idatt2506.httpandcoroutines.utils.NetworkUtils.sendGetRequestWithParams
+import java.net.URLEncoder
 
 class GuessActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_guess)
+        setContentView(R.layout.activity_guess)  // Assuming you have a layout for this activity
 
         val guessEditText: EditText = findViewById(R.id.guessEditText)
         val submitGuessButton: Button = findViewById(R.id.submitGuessButton)
         val responseTextView: TextView = findViewById(R.id.responseTextView)
 
-        //... Rest of the code that deals with the guessing game.
-
         submitGuessButton.setOnClickListener {
-            val guessedNumber = guessEditText.text.toString()
+            val guess = guessEditText.text.toString()
 
-            // Use lifecycleScope for sending the guessed number to the server
+            // Convert data into URL-encoded format
+            val guessInfo = StringBuilder()
+            guessInfo.append("tall=").append(URLEncoder.encode(guess, "UTF-8"))
+
+            // Use lifecycleScope for sending the guess to the server
             lifecycleScope.launch(Dispatchers.IO) {
                 val response = NetworkUtils.sendGetRequestWithParams(
                     "https://bigdata.idi.ntnu.no/mobil/tallspill.jsp",
-                    "{\"tall\":\"$guessedNumber\"}"
+                    guessInfo.toString()
                 )
                 withContext(Dispatchers.Main) {
                     responseTextView.text = response
+                    // Handle the server's response for the guess here
                 }
             }
         }
     }
-
-
 }
