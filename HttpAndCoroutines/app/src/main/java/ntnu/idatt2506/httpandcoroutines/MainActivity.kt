@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity() {
                     responseTextView.text = response
                     if (response.contains("Oppgi et tall mellom")) {
                         val intent = Intent(this@MainActivity, GuessActivity::class.java)
+                        intent.putExtra("responseText", response)  // add this line
                         startActivity(intent)
                     }
                 }

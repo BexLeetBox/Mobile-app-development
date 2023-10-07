@@ -19,9 +19,15 @@ class GuessActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_guess)  // Assuming you have a layout for this activity
 
+        // Retrieve the passed data
+        val responseTextFromMain = intent.getStringExtra("responseText")
+
         val guessEditText: EditText = findViewById(R.id.guessEditText)
         val submitGuessButton: Button = findViewById(R.id.submitGuessButton)
         val responseTextView: TextView = findViewById(R.id.responseTextView)
+        val guessDesc: TextView = findViewById(R.id.guessDesc)
+
+        guessDesc.text = responseTextFromMain;
 
         submitGuessButton.setOnClickListener {
             val guess = guessEditText.text.toString()
