@@ -13,18 +13,13 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ntnu.idatt2506.httpandcoroutines.activity.GuessActivity
-import ntnu.idatt2506.httpandcoroutines.utils.NetworkUtils.sendPostRequest
+import ntnu.idatt2506.httpandcoroutines.utils.NetworkUtils
+import ntnu.idatt2506.httpandcoroutines.utils.NetworkUtils.sendGetRequestWithParams
 import org.json.JSONObject
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.io.OutputStream
-import java.net.HttpURLConnection
-import java.net.URL
-import java.nio.charset.StandardCharsets
-
-class MainActivity : AppCompatActivity(){
+import java.net.URLEncoder
 
 
+class MainActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,19 +35,20 @@ class MainActivity : AppCompatActivity(){
             val playerName = nameEditText.text.toString()
             val cardNumber = cardEditText.text.toString()
 
-            val playerInfo = JSONObject()
-            playerInfo.put("name", playerName)
-            playerInfo.put("cardNumber", cardNumber)
+            // Convert data into URL-encoded format
+            val playerInfo = StringBuilder()
+            playerInfo.append("navn=").append(URLEncoder.encode(playerName, "UTF-8"))
+            playerInfo.append("&kortnummer=").append(URLEncoder.encode(cardNumber, "UTF-8"))
 
             // Use lifecycleScope for sending player information to the server
             lifecycleScope.launch(Dispatchers.IO) {
-                val response = sendPostRequest(
+                val response = NetworkUtils.sendGetRequestWithParams(
                     "https://bigdata.idi.ntnu.no/mobil/tallspill.jsp",
                     playerInfo.toString()
                 )
                 withContext(Dispatchers.Main) {
                     responseTextView.text = response
-                    if (response.contains("Oppgi et tall mellom")) {  // you might need a better check here
+                    if (response.contains("Oppgi et tall mellom")) {
                         val intent = Intent(this@MainActivity, GuessActivity::class.java)
                         startActivity(intent)
                     }
@@ -62,7 +58,8 @@ class MainActivity : AppCompatActivity(){
 
 
 
-       /** newGameButton.setOnClickListener {
+
+        /** newGameButton.setOnClickListener {
             // Handle starting a new game here
         }*/
 

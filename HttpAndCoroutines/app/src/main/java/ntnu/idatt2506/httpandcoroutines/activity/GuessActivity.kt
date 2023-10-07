@@ -10,7 +10,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ntnu.idatt2506.httpandcoroutines.R
-import ntnu.idatt2506.httpandcoroutines.utils.NetworkUtils.sendPostRequest
+import ntnu.idatt2506.httpandcoroutines.utils.NetworkUtils
+import ntnu.idatt2506.httpandcoroutines.utils.NetworkUtils.sendGetRequestWithParams
 
 class GuessActivity : AppCompatActivity() {
 
@@ -29,7 +30,7 @@ class GuessActivity : AppCompatActivity() {
 
             // Use lifecycleScope for sending the guessed number to the server
             lifecycleScope.launch(Dispatchers.IO) {
-                val response = sendPostRequest(
+                val response = NetworkUtils.sendGetRequestWithParams(
                     "https://bigdata.idi.ntnu.no/mobil/tallspill.jsp",
                     "{\"tall\":\"$guessedNumber\"}"
                 )

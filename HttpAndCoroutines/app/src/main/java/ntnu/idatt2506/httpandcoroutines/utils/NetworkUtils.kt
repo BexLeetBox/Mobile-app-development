@@ -1,52 +1,56 @@
 package ntnu.idatt2506.httpandcoroutines.utils
 
 import android.util.Log
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
-import java.io.OutputStream
+import java.net.CookieHandler
+import java.net.CookieManager
 import java.net.HttpURLConnection
 import java.net.URL
-import java.nio.charset.StandardCharsets
+
 
 object NetworkUtils {
+    private val cookieManager = CookieManager()
 
-    suspend fun sendPostRequest(apiUrl: String, data: String): String {
+    init {
+        CookieHandler.setDefault(cookieManager)
+    }
+
+    suspend fun sendGetRequestWithParams(apiUrl: String, params: String): String {
         var result = ""
         var connection: HttpURLConnection? = null
 
         try {
-            val url = URL(apiUrl)
+            val url = URL("$apiUrl?$params")
             connection = url.openConnection() as HttpURLConnection
-            connection.requestMethod = "POST"
-            connection.setRequestProperty("Content-Type", "application/json; utf-8")
-            connection.doOutput = true
+            connection.requestMethod = "GET"
 
-            // Write data to the server
-            val os: OutputStream = connection.outputStream
-            val input: ByteArray = data.toByteArray(StandardCharsets.UTF_8)
-            os.write(input, 0, input.size)
+            // Setting up cookies
+            val cookie = cookieManager.cookieStore.get(url.toURI()).joinToString(separator = "; ") {
+                "${it.name}=${it.value}"
+            }
+            if (cookie.isNotEmpty()) {
+                connection.setRequestProperty("Cookie", cookie)
+            }
 
             // Get the server response
             val responseCode = connection.responseCode
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 val reader = BufferedReader(InputStreamReader(connection.inputStream))
                 val response = StringBuilder()
-                var line: String? = reader.readLine()
-                while (line != null) {
-                    response.append(line)
+                var line: String?
+                do {
                     line = reader.readLine()
-                }
+                    if (line != null) response.append(line)
+                } while (line != null)
                 result = response.toString()
-
-                Log.i("result from server: ",result)
+                Log.i("result from server: ", result)
             } else {
                 result = "Error: $responseCode"
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Log.e("NetworkError", "Error sending POST request", e)
+            Log.e("NetworkError", "Error sending GET request", e)
         } finally {
             connection?.disconnect()
         }
