@@ -7,6 +7,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import ntnu.idatt2506.sockets.server.Server
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.Socket
@@ -20,6 +21,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var socket: Socket
     private lateinit var input: DataInputStream
     private lateinit var output: DataOutputStream
+    private lateinit var server: Server
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +34,10 @@ class MainActivity : AppCompatActivity() {
         sendButton.isEnabled = false  //to circumvent race condition bugs
 
     //-------------------------- thread stuff ------------------------------//
+
+        server = Server(chatTextView)
+        server.start()
+
 
         thread {
             try {
@@ -77,6 +84,7 @@ class MainActivity : AppCompatActivity() {
             input.close()
             output.close()
             socket.close()
+            server.stop()
         } catch (e: Exception) {
             // Handle exception if needed
         }

@@ -17,6 +17,8 @@ class Server(private val textView: TextView, private val port: Int = 12345) {
 
 
     private var clients = mutableListOf<Socket>()
+    private var serverSocket: ServerSocket? = null
+
 
     private var ui: String? = ""
         set(str) {
@@ -29,6 +31,7 @@ class Server(private val textView: TextView, private val port: Int = 12345) {
             try {
                 ui = "Starting Server ..."
                 withContext(Dispatchers.IO) {
+                    serverSocket = ServerSocket(port)
                     ServerSocket(port).use { serverSocket ->
                         ui = "ServerSocket created, waiting for clients..."
                         while (true) {
@@ -66,5 +69,23 @@ class Server(private val textView: TextView, private val port: Int = 12345) {
             }
         }
         ui = "Broadcasted: $message"
+    }
+    fun stop() {
+        try {
+            // Close all client sockets
+            for (client in clients) {
+                try {
+                    client.close()
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+            }
+            clients.clear()
+
+            // Close the ServerSocket
+            serverSocket?.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
     }
 }
