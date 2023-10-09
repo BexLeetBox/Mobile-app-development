@@ -7,7 +7,6 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import ntnu.idatt2506.sockets.server.Server
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.Socket
@@ -21,7 +20,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var socket: Socket
     private lateinit var input: DataInputStream
     private lateinit var output: DataOutputStream
-    private lateinit var server: Server
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,19 +30,19 @@ class MainActivity : AppCompatActivity() {
         chatTextView = findViewById(R.id.tv_chat)
         messageEditText = findViewById(R.id.et_message)
         sendButton = findViewById(R.id.btn_send)
-        sendButton.isEnabled = false  //to circumvent race condition bugs
+        sendButton.isEnabled = true  //to circumvent race condition bugs
 
     //-------------------------- thread stuff ------------------------------//
 
-        server = Server(chatTextView)
-        server.start()
 
 
         thread {
             try {
-                socket = Socket("localhost", 12345)
+                socket = Socket("localhost", 1234)
                 input = DataInputStream(socket.getInputStream())
                 output = DataOutputStream(socket.getOutputStream())
+
+                Log.d("Client", "Connected to server at 10.0.0.82:1234")
 
                 runOnUiThread {
                     sendButton.isEnabled = true
@@ -73,6 +72,9 @@ class MainActivity : AppCompatActivity() {
             chatTextView.append("\nSent: $message")
             thread {
                 output.writeUTF(message)
+                Log.d("Client", "Sent message: $message")
+                output.flush()
+
             }
         }
     }
@@ -84,7 +86,6 @@ class MainActivity : AppCompatActivity() {
             input.close()
             output.close()
             socket.close()
-            server.stop()
         } catch (e: Exception) {
             // Handle exception if needed
         }
