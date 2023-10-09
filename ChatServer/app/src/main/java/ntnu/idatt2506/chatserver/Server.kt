@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.DataInputStream
+import java.io.EOFException
 import java.io.IOException
 import java.io.InputStreamReader
 import java.io.PrintWriter
@@ -65,17 +66,29 @@ class Server(private val textView: TextView, private val port: Int = 1234) {
 
     private fun handleClient(clientSocket: Socket) {
         val dataInputStream = DataInputStream(clientSocket.getInputStream())
-        val message = dataInputStream.readUTF()
-        ui = "Client says: $message"
-        Log.d(TAG, "Client says: $message") // Log errors
-        broadcast(message)
+        try {
+            while (true) {  // Continuously read messages
+                val message = dataInputStream.readUTF()
+                ui = "Client says: $message"
+                Log.d(TAG, "Client says: $message")
+                broadcast(message)
+            }
+        } catch (e: EOFException) {
+            // Client disconnected or some other read error occurred.
+            Log.d(TAG, "Connection with client ended: ${e.message}")
+        } catch (e: IOException) {
+            // Handle other IO exceptions
+            Log.e(TAG, "Error reading from client: ${e.message}")
+        }
     }
+
 
     private fun broadcast(message: String) {
         for (client in clients) {
             if (!client.isClosed) {
                 val writer = PrintWriter(client.getOutputStream(), true)
                 writer.println(message)
+                writer.flush() // Ensure the message is sent immediately
                 ui = "Sent to ${client.remoteSocketAddress}: $message"
             }
         }
