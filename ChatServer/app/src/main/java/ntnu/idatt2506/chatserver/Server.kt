@@ -78,7 +78,7 @@ class Server(private val textView: TextView, private val port: Int = 1234) {
                 }
                 ui = "Received from $clientAddress: $message"
                 Log.d(TAG, "Received from $clientAddress: $message")
-                broadcast(message)
+                broadcast(message, clientSocket)
             }
         } catch (e: EOFException) {
             // Client disconnected or some other read error occurred.
@@ -93,9 +93,12 @@ class Server(private val textView: TextView, private val port: Int = 1234) {
     }
 
 
-    private fun broadcast(message: String) {
+    private fun broadcast(message: String, sender: Socket? = null) {
         for (client in clients) {
             val clientAddress = client.remoteSocketAddress.toString()
+            //don't need to send the sender the message it sent back to itself
+            if (client == sender) continue
+
             ui = if (!client.isClosed) {
                 try {
                     val writer = PrintWriter(client.getOutputStream(), true)
