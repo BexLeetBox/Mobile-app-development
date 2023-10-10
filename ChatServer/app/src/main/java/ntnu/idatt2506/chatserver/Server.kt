@@ -68,16 +68,26 @@ class Server(private val textView: TextView, private val port: Int = 1234) {
         val dataInputStream = DataInputStream(clientSocket.getInputStream())
         try {
             while (true) {  // Continuously read messages
-                val message = dataInputStream.readUTF()
+                val reader = BufferedReader(InputStreamReader(clientSocket.getInputStream()))
+                val message = reader.readLine()
+                if (message == null) {
+                    ui = "Client disconnected"
+                    clients.remove(clientSocket)
+                    clientSocket.close()
+                    break
+                }
                 ui = "Received from $clientAddress: $message"
                 Log.d(TAG, "Received from $clientAddress: $message")
                 broadcast(message)
             }
         } catch (e: EOFException) {
             // Client disconnected or some other read error occurred.
+            ui = "Exception when reading"
             Log.w(TAG, "Connection with client $clientAddress ended: ${e.localizedMessage}") // Using warning level
         } catch (e: IOException) {
             // Handle other IO exceptions
+            ui = "Exception when reading IO"
+            ui = e.message
             Log.e(TAG, "Error reading from client $clientAddress", e) // Detailed stack trace for other IO errors
         }
     }
@@ -86,18 +96,21 @@ class Server(private val textView: TextView, private val port: Int = 1234) {
     private fun broadcast(message: String) {
         for (client in clients) {
             val clientAddress = client.remoteSocketAddress.toString()
-            if (!client.isClosed) {
+            ui = if (!client.isClosed) {
                 try {
                     val writer = PrintWriter(client.getOutputStream(), true)
                     writer.println(message)
-                    writer.flush() // Ensure the message is sent immediately
                     Log.d(TAG, "Message sent to $clientAddress: $message")
-                    ui = "Sent to $clientAddress: $message"
+                    "Sent to $clientAddress: $message"
                 }catch (e: IOException) {
+                    ui = "Exception when writing IO"
                     Log.e(TAG, "Error broadcasting to client $clientAddress", e)
+                    "Error broadcasting to client "
                 }
             } else {
+                ui = "skipped closed client"
                 Log.w(TAG, "Skipped closed client $clientAddress during broadcast")
+                "Skipped closed client"
             }
 
         }
