@@ -7,8 +7,11 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import java.io.BufferedReader
 import java.io.DataInputStream
 import java.io.DataOutputStream
+import java.io.InputStreamReader
+import java.io.PrintWriter
 import java.net.Socket
 import kotlin.concurrent.thread
 
@@ -19,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sendButton: Button
     private lateinit var socket: Socket
     private lateinit var input: DataInputStream
-    private lateinit var output: DataOutputStream
+    private lateinit var output: PrintWriter
 
 
 
@@ -34,33 +37,44 @@ class MainActivity : AppCompatActivity() {
 
     //-------------------------- thread stuff ------------------------------//
 
-
-
         thread {
             try {
-                socket = Socket("localhost", 1234)
-                input = DataInputStream(socket.getInputStream())
-                output = DataOutputStream(socket.getOutputStream())
+                socket = Socket("10.0.0.83", 1234)
 
-                Log.d("Client", "Connected to server at 10.0.0.82:1234")
 
-                runOnUiThread {
-                    sendButton.isEnabled = true
+
+
+                Log.d("Client", "Connected to server")
+
+                if (socket.isConnected) {
+                    runOnUiThread {
+                        chatTextView.append("\n Successfully connected to server")
+                        sendButton.isEnabled = true
+                    }
+                } else {
+                    chatTextView.append("\n IS NOT Connected to server")
                 }
 
+
+
+
                 while (true) {
-                    val message = input.readUTF()
+                    val input = BufferedReader(InputStreamReader(socket.getInputStream())) // This will give an error because types are different
+                    val message = input.readLine()
+                    Log.d("Reading input stream", message)
                     runOnUiThread {
                         chatTextView.append("\nReceived: $message")
                     }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+
                 runOnUiThread {
+                    chatTextView.append("\nFailed to connect to server")
                     // You can provide a more detailed error message based on the exception type.
                     val errorMsg = "Failed to connect to server: ${e.message}"
                     Toast.makeText(this@MainActivity, errorMsg, Toast.LENGTH_LONG).show()
-                    Log.e("Socket error", e.toString())
+                    Log.e("Socket error", errorMsg)
                 }
             }
         }
@@ -69,12 +83,14 @@ class MainActivity : AppCompatActivity() {
 
         sendButton.setOnClickListener {
             val message = messageEditText.text.toString()
-            chatTextView.append("\nSent: $message")
-            thread {
-                output.writeUTF(message)
-                Log.d("Client", "Sent message: $message")
-                output.flush()
 
+            thread {
+                output = PrintWriter(socket.getOutputStream(), true)
+                output.println(message)
+                Log.d("Client", "Sent message: $message")
+                runOnUiThread{
+                    chatTextView.append("\nSent: $message")
+                }
             }
         }
     }
