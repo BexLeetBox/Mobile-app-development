@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">Data storing</string>
+
+    <string-array name="color_names">
+        <item>Purple 200</item>
+        <item>Purple 500</item>
+        <item>Purple 700</item>
+        <item>Teal 200</item>
+        <item>Teal 700</item>
+        <item>Black</item>
+        <item>White</item>
+    </string-array>
+
+
 </resources>

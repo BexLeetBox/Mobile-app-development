@@ -7,7 +7,15 @@
     android:padding="16dp"
     android:orientation="vertical"
     android:gravity="center"
+    android:id="@+id/mainLayout"
     tools:context=".MainActivity">
+
+    <Spinner
+        android:id="@+id/colorSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:entries="@array/color_names"/>
+
 
     <TextView
         android:id="@+id/welcomeText"
