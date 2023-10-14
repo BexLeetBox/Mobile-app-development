@@ -1,0 +1,12 @@
+[
+  {
+    "title": "Movie1",
+    "director": "DirectorA",
+    "actors": ["ActorA1", "ActorA2"]
+  },
+  {
+    "title": "Movie2",
+    "director": "DirectorB",
+    "actors": ["ActorB1", "ActorB2"]
+  }
+]
