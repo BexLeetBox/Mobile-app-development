@@ -19,6 +19,7 @@ import org.json.JSONArray
 import java.io.IOException
 import java.io.OutputStreamWriter
 import kotlinx.coroutines.*
+import ntnu.idatt2506.datastoring.adapter.AdapterMode
 import kotlin.coroutines.CoroutineContext
 
 class MainActivity : AppCompatActivity(), CoroutineScope {
@@ -61,19 +62,34 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 // Do nothing
             }
-
-
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 launch {
-                    val movies = withContext(Dispatchers.IO) {
+                    val filterResult = withContext(Dispatchers.IO) {
                         filterData(position)
                     }
-                    val adapter = MovieAdapter(movies)
-                    movieRecyclerView.adapter = adapter
-                }
+                    when (filterResult) {
+                        is FilterResult.MoviesAndActors -> {
+                            val moviesData = filterResult.list.map { "${it.title}|${it.director}|${it.actors}" }
+                            val adapter = MovieAdapter(AdapterMode.MOVIES, moviesData)
+                            movieRecyclerView.adapter = adapter
+                        }
+                        is FilterResult.Movies -> {
+                            val moviesData = filterResult.list.map { it.title }
+                            val adapter = MovieAdapter(AdapterMode.SINGLE_TITLE, moviesData)
+                            movieRecyclerView.adapter = adapter
+                        }
+                        is FilterResult.Actors -> {
+                            val adapter = MovieAdapter(AdapterMode.ACTORS, filterResult.list)
+                            movieRecyclerView.adapter = adapter
+                        }
+                    }
 
+                }
             }
+
         }
+
+
 
 
 
@@ -135,7 +151,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
             Thread {
                 val movies = db.movieDao().getAllMovies()
                 runOnUiThread {
-                    val adapter = MovieAdapter(movies)
+                    val moviesData = movies.map { "${it.title}|${it.director}|${it.actors}" }
+                    val adapter = MovieAdapter(AdapterMode.MOVIES, moviesData)
                     movieRecyclerView.adapter = adapter
                 }
             }.start()
@@ -146,34 +163,48 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
 
     }
 
-    private fun filterData(selectedPosition: Int): List<Movie> {
+    private fun filterData(selectedPosition: Int): FilterResult {
         val db: AppDatabase = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "movies.db").build()
         return when(selectedPosition) {
-            0 -> db.movieDao().getAllMovies() // All movies
-            3 -> db.movieDao().getMoviesByDirector("Christopher Nolan")
-            else -> db.movieDao().getAllMovies() // For now, default to all movies
+            0 -> FilterResult.Movies(db.movieDao().getAllMovies())
+            1 -> FilterResult.Actors(db.movieDao().getAllActors())
+            2 -> FilterResult.MoviesAndActors(db.movieDao().getAllMovies())// Use the new FilterResult.Movies for just movies
+            3 -> FilterResult.MoviesAndActors(db.movieDao().getMoviesByDirector("Christopher Nolan"))
+            else -> FilterResult.MoviesAndActors(db.movieDao().getAllMovies())
         }
     }
+
+
 
 
     private fun saveMoviesToFile() {
+        val db: AppDatabase = Room.databaseBuilder(
+            applicationContext, AppDatabase::class.java,
+            "movies.db"
+        ).build()
 
-        val movieList = listOf(
-            mapOf("title" to "Movie 1", "director" to "Director 1", "actors" to listOf("Actor 1", "Actor 2")),
-            // ... add more movies
-            // ... add more movies
-        )
+        // This should run in a background thread since Room doesn't allow database operations on the main thread
+        Thread {
+            val moviesFromDb = db.movieDao().getAllMovies()
 
-        val json = JSONArray(movieList).toString()
+            val movieList = moviesFromDb.map { movie ->
+                mapOf(
+                    "title" to movie.title,
+                    "director" to movie.director,
+                    "actors" to movie.actors.split(", ")
+                )
+            }
 
-        applicationContext.openFileOutput("movies.json", Context.MODE_PRIVATE).use {
-            val writer = OutputStreamWriter(it)
-            writer.write(json)
-            writer.close()
-        }
+            val json = JSONArray(movieList).toString()
 
-
+            applicationContext.openFileOutput("movies.json", Context.MODE_PRIVATE).use {
+                val writer = OutputStreamWriter(it)
+                writer.write(json)
+                writer.close()
+            }
+        }.start()
     }
+
 
     private fun loadMoviesFromFile(): List<Map<String, Any>> {
         val json = applicationContext.openFileInput("movies.json").bufferedReader().use {

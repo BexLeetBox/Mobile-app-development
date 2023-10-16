@@ -7,26 +7,45 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ntnu.idatt2506.datastoring.R
 import ntnu.idatt2506.datastoring.entity.Movie
+enum class AdapterMode {
+    MOVIES, ACTORS, SINGLE_TITLE
+}
 
-class MovieAdapter(private val movies: List<Movie>) : RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
 
-    inner class MovieViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class MovieAdapter(private val mode: AdapterMode, private val items: List<String>) : RecyclerView.Adapter<MovieAdapter.ViewHolder>() {
+
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val titleTextView: TextView = itemView.findViewById(R.id.titleTextView)
         val directorTextView: TextView = itemView.findViewById(R.id.directorTextView)
         val actorsTextView: TextView = itemView.findViewById(R.id.actorsTextView)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.movie_item, parent, false)
-        return MovieViewHolder(view)
+        return ViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
-        val movie = movies[position]
-        holder.titleTextView.text = movie.title
-        holder.directorTextView.text = movie.director
-        holder.actorsTextView.text = movie.actors
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        when (mode) {
+            AdapterMode.MOVIES -> {
+                val movieData = items[position].split("|") // Assuming delimiter is '|'
+                holder.titleTextView.text = movieData[0]
+                holder.directorTextView.text = movieData[1]
+                holder.actorsTextView.text = movieData[2]
+            }
+            AdapterMode.SINGLE_TITLE -> {
+                holder.titleTextView.text = items[position]
+                holder.directorTextView.visibility = View.GONE
+                holder.actorsTextView.visibility = View.GONE
+            }
+            AdapterMode.ACTORS -> {
+                holder.titleTextView.text = items[position]
+                holder.directorTextView.visibility = View.GONE
+                holder.actorsTextView.visibility = View.GONE
+            }
+        }
     }
 
-    override fun getItemCount(): Int = movies.size
+    override fun getItemCount(): Int = items.size
 }
+

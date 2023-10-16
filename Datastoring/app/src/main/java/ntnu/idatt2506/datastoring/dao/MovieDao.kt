@@ -13,9 +13,8 @@ interface MovieDao {
     @Query("SELECT * FROM movie")
     fun getAllMovies(): List<Movie>
 
-
-    @Query("SELECT * FROM movie")
-    fun getAllActors(): List<Movie>
+    @Query("SELECT actors FROM movie")
+    fun getAllActors(): List<String>
 
     @Query("SELECT * FROM movie WHERE director = :director")
     fun getMoviesByDirector(director: String): List<Movie>
