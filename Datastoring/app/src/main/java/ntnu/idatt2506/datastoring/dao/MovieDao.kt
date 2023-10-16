@@ -10,6 +10,9 @@ interface MovieDao {
     @Query("SELECT * FROM movie")
     fun getAll(): List<Movie>
 
+    @Query("SELECT * FROM Movie")
+    fun getAllMovies(): List<Movie>
+
     @Insert
     fun insertAll(vararg movies: Movie)
 }

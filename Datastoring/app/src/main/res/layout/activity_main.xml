@@ -10,12 +10,12 @@
     android:id="@+id/mainLayout"
     tools:context=".MainActivity">
 
+    <!-- Spinner for background color selection -->
     <Spinner
         android:id="@+id/colorSpinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:entries="@array/color_names"/>
-
 
     <TextView
         android:id="@+id/welcomeText"
@@ -26,10 +26,31 @@
         android:gravity="center"
         android:layout_marginBottom="16dp" />
 
-    <Button
-        android:id="@+id/loadMoviesButton"
+    <!-- Spinner for movie info filter (e.g., all movies, movies by a director, actors for a movie) -->
+    <Spinner
+        android:id="@+id/infoFilterSpinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Load Movies into Database" />
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:entries="@array/filter_types"/> <!-- You'll need to define this string-array in your resources -->
+
+    <!-- Button to load movies -->
+    <Button
+        android:id="@+id/fetchDataButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Load Movies into Database"
+        android:layout_marginBottom="16dp" />
+
+    <!-- RecyclerView to display the movie data from the database -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/movieRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"/>
 
 </LinearLayout>

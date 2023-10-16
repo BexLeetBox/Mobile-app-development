@@ -1,7 +1,10 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("kotlin-kapt")
 }
+
+
 
 android {
     namespace = "ntnu.idatt2506.datastoring"
@@ -18,8 +21,12 @@ android {
     }
 
     buildTypes {
+
+
         release {
             isMinifyEnabled = false
+
+
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -43,13 +50,15 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.10.0")
     implementation("androidx.room:room-common:2.5.2")
-    annotationProcessor("androidx.room:room-compiler:2.5.2")
+    kapt ("androidx.room:room-compiler:2.5.2")
+
+
     implementation("androidx.room:room-ktx:2.5.2")
     implementation ("org.jetbrains:annotations:20.1.0")
+    implementation ("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
-
 

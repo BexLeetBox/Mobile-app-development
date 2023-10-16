@@ -10,6 +10,12 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.room.Room
+import ntnu.idatt2506.datastoring.adapter.MovieAdapter
+import ntnu.idatt2506.datastoring.database.AppDatabase
+import ntnu.idatt2506.datastoring.entity.Movie
 import org.json.JSONArray
 import java.io.IOException
 import java.io.OutputStreamWriter
@@ -25,17 +31,23 @@ class MainActivity : AppCompatActivity() {
         val editor = sharedPref.edit()
 
         // Get current saved background color
-        val mainLayout: View = findViewById(R.id.mainLayout) // Assuming you have a root layout with this ID
+        val mainLayout: View =
+            findViewById(R.id.mainLayout) // Assuming you have a root layout with this ID
         val bgColor = sharedPref.getInt("backgroundColor", resources.getColor(R.color.black, null))
         mainLayout.setBackgroundColor(bgColor)
 
         // Set up the spinner
         val spinner: Spinner = findViewById(R.id.colorSpinner)
-        val adapter = ArrayAdapter.createFromResource(this, R.array.color_names, android.R.layout.simple_spinner_item)
+        val adapter = ArrayAdapter.createFromResource(
+            this,
+            R.array.color_names,
+            android.R.layout.simple_spinner_item
+        )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = adapter
         // Get saved color position
-        val colorNames = resources.getIntArray(R.array.color_values) // Assuming you have an integer-array of color values
+        val colorNames =
+            resources.getIntArray(R.array.color_values) // Assuming you have an integer-array of color values
         val savedColorPosition = colorNames.indexOf(bgColor)
 
         // Initialize without firing onItemSelected
@@ -46,7 +58,12 @@ class MainActivity : AppCompatActivity() {
                 // Do nothing
             }
 
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
                 val selectedColor = when (position) {
                     0 -> resources.getColor(R.color.purple_200, null)
                     1 -> resources.getColor(R.color.purple_500, null)
@@ -62,11 +79,37 @@ class MainActivity : AppCompatActivity() {
                 editor.putInt("backgroundColor", selectedColor).apply()
             }
         }
+
+
+        val movieRecyclerView: RecyclerView = findViewById(R.id.movieRecyclerView)
+        movieRecyclerView.layoutManager = LinearLayoutManager(this)
+        val db: AppDatabase = Room.databaseBuilder(
+            applicationContext, AppDatabase::class.java,
+            "movies.db"
+        ).build()
+
+        val fetchDataButton: Button = findViewById(R.id.fetchDataButton)
+        fetchDataButton.setOnClickListener {
+            // Execute on a background thread since Room doesn't allow database operations on the main thread
+            Thread {
+                val movies = db.movieDao().getAllMovies()
+                runOnUiThread {
+                    val adapter = MovieAdapter(movies)
+                    movieRecyclerView.adapter = adapter
+                }
+            }.start()
+        }
+        saveMoviesToFile()
+        loadMoviesFromFile()
+        initDatabaseFromRawResource()
+
     }
 
     private fun saveMoviesToFile() {
+
         val movieList = listOf(
             mapOf("title" to "Movie 1", "director" to "Director 1", "actors" to listOf("Actor 1", "Actor 2")),
+            // ... add more movies
             // ... add more movies
         )
 
@@ -77,6 +120,8 @@ class MainActivity : AppCompatActivity() {
             writer.write(json)
             writer.close()
         }
+
+
     }
 
     private fun loadMoviesFromFile(): List<Map<String, Any>> {
@@ -101,9 +146,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initDatabaseFromRawResource() {
-        // Using SQLite database to store movie data
-        val db: SQLiteDatabase = openOrCreateDatabase("MoviesDB", MODE_PRIVATE, null)
-        db.execSQL("CREATE TABLE IF NOT EXISTS movies(title VARCHAR, director VARCHAR, actor1 VARCHAR, actor2 VARCHAR)")
+        val db: AppDatabase = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "movies.db").build()
 
         try {
             val inputStream = resources.openRawResource(R.raw.movies)
@@ -113,22 +156,33 @@ class MainActivity : AppCompatActivity() {
             val json = String(buffer, Charsets.UTF_8)
 
             val jsonArray = JSONArray(json)
+            val movies = mutableListOf<Movie>()
             for (i in 0 until jsonArray.length()) {
                 val obj = jsonArray.getJSONObject(i)
                 val title = obj.getString("title")
                 val director = obj.getString("director")
                 val actorsArray = obj.getJSONArray("actors")
-                val actor1 = actorsArray.getString(0)
-                val actor2 = actorsArray.getString(1)
 
-                db.execSQL("INSERT INTO movies VALUES(?, ?, ?, ?);", arrayOf(title, director, actor1, actor2))
+                // Convert the actors JSON array to a comma-separated string
+                val actorsList = List(actorsArray.length()) { index ->
+                    actorsArray.getString(index)
+                }
+                val actorsString = actorsList.joinToString(", ")
+
+                // Now, construct the Movie object with this actors string
+                movies.add(Movie(0, title, director, actorsString)) // We set 0 for the id since it's auto-generated
             }
+            // Save to database
+            Thread {
+                db.movieDao().insertAll(*movies.toTypedArray())
+            }.start()
+
         } catch (e: IOException) {
             Log.e("MainActivity", "Error reading movies.json", e)
         } catch (e: Exception) {
             Log.e("MainActivity", "Error inserting into database", e)
-        } finally {
-            db.close()
         }
     }
+
+
 }

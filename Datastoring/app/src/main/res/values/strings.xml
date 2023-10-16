@@ -11,5 +11,11 @@
         <item>White</item>
     </string-array>
 
+    <string-array name="filter_types">
+        <item>All Movies</item>
+        <item>Movies by Director</item>
+        <item>Actors of a Movie</item>
+    </string-array>
+
 
 </resources>
