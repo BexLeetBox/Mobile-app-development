@@ -13,8 +13,9 @@
 
     <string-array name="filter_types">
         <item>All Movies</item>
-        <item>Movies by Director</item>
-        <item>Actors of a Movie</item>
+        <item>All actors</item>
+        <item>All movies and actors</item>
+        <item>All movies by Christopher Nolan</item>
     </string-array>
 
 

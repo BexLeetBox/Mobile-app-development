@@ -1,7 +1,6 @@
 package ntnu.idatt2506.datastoring
 
 import android.content.Context
-import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -19,9 +18,23 @@ import ntnu.idatt2506.datastoring.entity.Movie
 import org.json.JSONArray
 import java.io.IOException
 import java.io.OutputStreamWriter
+import kotlinx.coroutines.*
+import kotlin.coroutines.CoroutineContext
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), CoroutineScope {
+    // Define a Job which can be used to cancel all coroutines started by this activity
+    private val job = Job()
+    private lateinit var movieRecyclerView: RecyclerView
 
+
+    // Define the default dispatcher
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main + job
+
+    override fun onDestroy() {
+        super.onDestroy()
+        job.cancel() // Cancel the job and all associated coroutines when the activity is destroyed
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -30,6 +43,10 @@ class MainActivity : AppCompatActivity() {
         val sharedPref = getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
         val editor = sharedPref.edit()
 
+        // Initialize movieRecyclerView here
+        movieRecyclerView = findViewById(R.id.movieRecyclerView)
+        movieRecyclerView.layoutManager = LinearLayoutManager(this)
+
         // Get current saved background color
         val mainLayout: View =
             findViewById(R.id.mainLayout) // Assuming you have a root layout with this ID
@@ -37,23 +54,46 @@ class MainActivity : AppCompatActivity() {
         mainLayout.setBackgroundColor(bgColor)
 
         // Set up the spinner
-        val spinner: Spinner = findViewById(R.id.colorSpinner)
+        val spinnerColor: Spinner = findViewById(R.id.colorSpinner)
+        val spinnerFilter: Spinner = findViewById(R.id.infoFilterSpinner)
+
+        spinnerFilter.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // Do nothing
+            }
+
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                launch {
+                    val movies = withContext(Dispatchers.IO) {
+                        filterData(position)
+                    }
+                    val adapter = MovieAdapter(movies)
+                    movieRecyclerView.adapter = adapter
+                }
+
+            }
+        }
+
+
+
+
         val adapter = ArrayAdapter.createFromResource(
             this,
             R.array.color_names,
             android.R.layout.simple_spinner_item
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner.adapter = adapter
+        spinnerColor.adapter = adapter
         // Get saved color position
         val colorNames =
             resources.getIntArray(R.array.color_values) // Assuming you have an integer-array of color values
         val savedColorPosition = colorNames.indexOf(bgColor)
 
         // Initialize without firing onItemSelected
-        spinner.setSelection(savedColorPosition, false)
+        spinnerColor.setSelection(savedColorPosition, false)
 
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        spinnerColor.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 // Do nothing
             }
@@ -81,6 +121,7 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+
         val movieRecyclerView: RecyclerView = findViewById(R.id.movieRecyclerView)
         movieRecyclerView.layoutManager = LinearLayoutManager(this)
         val db: AppDatabase = Room.databaseBuilder(
@@ -104,6 +145,16 @@ class MainActivity : AppCompatActivity() {
         initDatabaseFromRawResource()
 
     }
+
+    private fun filterData(selectedPosition: Int): List<Movie> {
+        val db: AppDatabase = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "movies.db").build()
+        return when(selectedPosition) {
+            0 -> db.movieDao().getAllMovies() // All movies
+            3 -> db.movieDao().getMoviesByDirector("Christopher Nolan")
+            else -> db.movieDao().getAllMovies() // For now, default to all movies
+        }
+    }
+
 
     private fun saveMoviesToFile() {
 
