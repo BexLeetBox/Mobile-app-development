@@ -1,6 +1,5 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:sudoku_app/widgets/sudoku_cell_widget.dart';
-
 import '../model/sudoku_board.dart';
 
 class SudokuBoardWidget extends StatelessWidget {
@@ -10,25 +9,37 @@ class SudokuBoardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 9,
-        childAspectRatio: 1.0,
-      ),
-      itemCount: 81,
-      itemBuilder: (context, index) {
-        int row = index ~/ 9;
-        int col = index % 9;
-        return SudokuCellWidget(
-          number: board.board[row][col],
-          onNumberSelected: (selectedNumber) {
-            // Here you handle the event when a number is selected for a cell
-            // For example, updating the board's data
-            // Make sure you update the board in a way that triggers a rebuild
-            // to reflect the new state, such as using setState in a StatefulWidget
+    // Get screen size
+    var screenSize = MediaQuery.of(context).size;
+
+    // Calculate the size of the grid
+    double gridWidth = screenSize.width * 0.4; // for example, 80% of screen width
+    double gridHeight = gridWidth; // To maintain the grid aspect ratio
+
+    return Center(
+      child: Container(
+        width: gridWidth,
+        height: gridHeight,
+        padding: const EdgeInsets.all(16.0), // Add padding around the grid
+        child: GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 9,
+            childAspectRatio: 1.0, // Cells are square-shaped
+          ),
+          itemCount: 81, // 9x9 Sudoku grid
+          itemBuilder: (context, index) {
+            int row = index ~/ 9;
+            int col = index % 9;
+            return SudokuCellWidget(
+              number: board.board[row][col],
+              onNumberSelected: (selectedNumber) {
+                // You'll need to implement this callback to handle number selection
+                // and update the board state accordingly
+              },
+            );
           },
-        );
-      },
+        ),
+      ),
     );
   }
 }
