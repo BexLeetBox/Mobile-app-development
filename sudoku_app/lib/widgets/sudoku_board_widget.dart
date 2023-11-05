@@ -1,8 +1,7 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:sudoku_app/widgets/sudoku_cell_widget.dart';
 
 import '../model/sudoku_board.dart';
-import 'sudoku_cell_widget.dart';
 
 class SudokuBoardWidget extends StatelessWidget {
   final SudokuBoard board;
@@ -22,12 +21,14 @@ class SudokuBoardWidget extends StatelessWidget {
         int col = index % 9;
         return SudokuCellWidget(
           number: board.board[row][col],
-          // Additional parameters like whether the cell is editable
-          // and callbacks for when the cell is tapped can be added
+          onNumberSelected: (selectedNumber) {
+            // Here you handle the event when a number is selected for a cell
+            // For example, updating the board's data
+            // Make sure you update the board in a way that triggers a rebuild
+            // to reflect the new state, such as using setState in a StatefulWidget
+          },
         );
       },
     );
   }
 }
-
-
