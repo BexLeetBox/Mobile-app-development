@@ -75,33 +75,48 @@ class SudokuHomePage extends StatefulWidget {
 }
 
 class _SudokuHomePageState extends State<SudokuHomePage> {
-  late SudokuBoard board;
+  SudokuBoard? board; // Initially null, can be nullable
   final Difficulty currentDifficulty = Difficulty.easy; // Example difficulty level
+
   @override
   void initState() {
     super.initState();
-    board = SudokuGenerator.generateBoard(currentDifficulty);
+    _generateBoard();
   }
 
-  void _resetBoard() {
+  Future<void> _generateBoard() async {
+    // Await the asynchronous operation to complete and then update the state
+    SudokuBoard newBoard = await SudokuGenerator.generateBoard(currentDifficulty);
     setState(() {
-      board = SudokuGenerator.generateBoard(currentDifficulty);
+      board = newBoard;
     });
   }
 
+  void _resetBoard() {
+    _generateBoard(); // Call _generateBoard to reset the board
+  }
+
+
   @override
   Widget build(BuildContext context) {
+    // Check if the board is null and show a loading spinner if it is
+    if (board == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Loading...'),
+        ),
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sudoku'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _resetBoard,
-          ),
-        ],
+        title: Text('Sudoku - ${board!.difficulty.toString().split('.').last}'),
       ),
-      body: SudokuBoardWidget(board: board),
+      body: SudokuBoardWidget(board: board!),
     );
   }
 }

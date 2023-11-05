@@ -1,11 +1,11 @@
+
 import 'package:flutter/material.dart';
-import 'package:sudoku_app/models/difficulty.dart'; // Assuming you have this enum
+
+import '../models/difficulty.dart';
+import 'board_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -14,17 +14,17 @@ class HomeScreen extends StatelessWidget {
         title: const Text('Sudoku Home'),
       ),
       body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            // When the user presses the button, navigate to the BoardScreen
-            // with the chosen difficulty level.
-            Navigator.pushNamed(
-              context,
-              '/board',
-              arguments: Difficulty.medium, // Pass the selected difficulty
-            );
-          },
-          child: const Text('Start Game'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: Difficulty.values.map((difficulty) => ElevatedButton(
+            onPressed: () {
+              // Pass the selected difficulty level to the BoardScreen
+              Navigator.push(context, MaterialPageRoute(
+                builder: (context) => BoardScreen(difficulty: difficulty),
+              ));
+            },
+            child: Text('Start ${difficulty.toString().split('.').last} Game'),
+          )).toList(),
         ),
       ),
     );

@@ -1,25 +1,54 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:sudoku_app/models/difficulty.dart';
 
 import '../model/sudoku_board.dart';
-import '../models/difficulty.dart';
 import '../utils/sudoku_generator.dart';
 import '../widgets/sudoku_board_widget.dart';
 
-class BoardScreen extends StatelessWidget {
-  final SudokuBoard board;
+class BoardScreen extends StatefulWidget {
+  final Difficulty difficulty;
 
-  BoardScreen({Key? key, required Difficulty difficulty})
-      : board = SudokuGenerator.generateBoard(difficulty),
-        super(key: key);
+  const BoardScreen({Key? key, required this.difficulty}) : super(key: key);
+
+  @override
+  _BoardScreenState createState() => _BoardScreenState();
+}
+
+class _BoardScreenState extends State<BoardScreen> {
+  SudokuBoard? board; // Initially null, will be set in initState
+
+  @override
+  void initState() {
+    super.initState();
+    _generateBoard();
+  }
+
+  Future<void> _generateBoard() async {
+    // Generate the board and set it in the state
+    SudokuBoard generatedBoard = await SudokuGenerator.generateBoard(widget.difficulty);
+    setState(() {
+      board = generatedBoard;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Show a loading indicator while the board is null
+    if (board == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Loading Sudoku...'),
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    // Once the board is loaded, show it
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sudoku - ${board.difficulty.toString().split('.').last}'),
+        title: Text('Sudoku - ${widget.difficulty.toString().split('.').last}'),
       ),
-      body: SudokuBoardWidget(board: board), // Make sure this line is correct
+      body: SudokuBoardWidget(board: board!),
     );
   }
 }
