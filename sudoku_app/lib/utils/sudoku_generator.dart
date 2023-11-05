@@ -1,9 +1,13 @@
+
+import 'package:sudoku_app/models/difficulty.dart';
+
 import '../model/sudoku_board.dart';
-import '../models/difficulty.dart';
 
 class SudokuGenerator {
   static SudokuBoard generateBoard(Difficulty difficulty) {
-    // No need to pass a newBoard, the SudokuBoard constructor will handle the board generation
-    return SudokuBoard(difficulty: difficulty);
+    // Generate the board here based on the difficulty
+    List<List<int>> newBoard = SudokuBoard.generateBoard(difficulty);
+    // Now pass the generated board and difficulty to the SudokuBoard constructor
+    return SudokuBoard(board: newBoard, difficulty: difficulty);
   }
 }
