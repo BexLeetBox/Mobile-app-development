@@ -1,15 +1,19 @@
+import 'package:sudoku_app/models/difficulty.dart';
+
 class SudokuBoard {
-  List<List<int>> board;
-  List<List<int>> _board = List.generate(9, (i) => List.generate(9, (j) => 0));
-  SudokuBoard(this.board);
+  late List<List<int>> board; // Use 'late' to indicate that it will be initialized later
+  Difficulty difficulty;
 
-
-
-  int getValue(int row, int col) => _board[row][col];
-
-  void setValue(int row, int col, int value) {
-    // Here you might want to include logic to check if the move is valid
-    _board[row][col] = value;
+  SudokuBoard({required this.difficulty}) {
+    // Initialize the board based on the difficulty
+    board = _generateInitialBoard(difficulty);
   }
-// Add methods for board manipulation and checking the rules here
+
+  List<List<int>> _generateInitialBoard(Difficulty difficulty) {
+    // Generate the initial board state based on difficulty
+    // Placeholder for actual board generation logic
+    return List.generate(9, (i) => List.generate(9, (j) => 0));
+  }
+
+// Other methods and logic for the SudokuBoard
 }
