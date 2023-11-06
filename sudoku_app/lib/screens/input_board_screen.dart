@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sudoku_app/models/difficulty.dart';
 import 'package:sudoku_app/storage/sudoku_storage.dart';
+import 'package:sudoku_app/widgets/sudoku_cell_widget.dart';
 
 import '../model/sudoku_board.dart';
 
@@ -13,18 +14,15 @@ class InputBoardScreen extends StatefulWidget {
 
 class _InputBoardScreenState extends State<InputBoardScreen> {
   final _formKey = GlobalKey<FormState>();
-  final List<List<TextEditingController>> _controllers;
-
-  _InputBoardScreenState()
-      : _controllers = List.generate(
+  List<List<int>> startingBoard = List.generate(9, (_) => List.generate(9, (_) => 0));
+  List<List<TextEditingController>> controllers = List.generate(
     9,
         (_) => List.generate(9, (_) => TextEditingController()),
   );
 
   @override
   void dispose() {
-    // Dispose controllers when the screen is disposed
-    for (var row in _controllers) {
+    for (var row in controllers) {
       for (var controller in row) {
         controller.dispose();
       }
@@ -40,7 +38,12 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.save),
-            onPressed: _saveBoard,
+            onPressed: () {
+              if (_formKey.currentState!.validate()) {
+                _formKey.currentState!.save();
+                // Save the board here
+              }
+            },
           ),
         ],
       ),
@@ -55,23 +58,14 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
           itemBuilder: (context, index) {
             int row = index ~/ 9;
             int col = index % 9;
-            return Padding(
-              padding: const EdgeInsets.all(2.0),
-              child: TextFormField(
-                controller: _controllers[row][col],
-                keyboardType: TextInputType.number,
-                textAlign: TextAlign.center,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: '0',
-                ),
-                onSaved: (value) {
-                  int number = int.tryParse(value ?? '') ?? 0;
-                  // Store the number in the board
-                  // Assuming you have a method in SudokuBoard to set the value
-                  // board.setValue(row, col, number);
-                },
-              ),
+            return SudokuCellWidget(
+              number: startingBoard[row][col],
+              isEditable: true,
+              onSaved: (newValue) {
+                setState(() {
+                  startingBoard[row][col] = newValue ?? 0;
+                });
+              },
             );
           },
         ),
@@ -79,34 +73,11 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
     );
   }
 
-  void _saveBoard() {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      // Convert the input from controllers into a 2D list of integers
-      List<List<int>> boardNumbers = _controllers.map((row) {
-        return row.map((controller) {
-          return int.tryParse(controller.text) ?? 0;
-        }).toList();
-      }).toList();
-
-      // Generate a new SudokuBoard with the input numbers
-      SudokuBoard newBoard = SudokuBoard(
-        board: boardNumbers,
-        difficulty: Difficulty.medium, // You might want to let the user select this
-      );
-
-      // Save the new board using SudokuStorage
-      SudokuStorage.saveBoard(newBoard).then((_) {
-        // Show a confirmation message or navigate away
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Board saved successfully')),
-        );
-      }).catchError((error) {
-        // Handle any errors here
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to save board')),
-        );
-      });
-    }
+  void _saveBoard() async {
+    // Assuming you have a way to get the difficulty selected by the user
+    Difficulty selectedDifficulty = Difficulty.easy; // This should be set by the user
+    SudokuBoard newBoard = SudokuBoard(board: startingBoard, difficulty: selectedDifficulty);
+    await SudokuStorage.saveBoard(newBoard);
+    // Show confirmation or navigate away
   }
 }

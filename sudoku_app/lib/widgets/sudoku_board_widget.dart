@@ -32,9 +32,11 @@ class SudokuBoardWidget extends StatelessWidget {
             int col = index % 9;
             return SudokuCellWidget(
               number: board.board[row][col],
-              onNumberSelected: (selectedNumber) {
-                // You'll need to implement this callback to handle number selection
+              isEditable: true, // or some logic to determine if the cell is editable
+              onSaved: (newValue) {
+                // Implement logic to handle number selection
                 // and update the board state accordingly
+                // This will likely require a stateful widget and calling setState
               },
             );
           },
