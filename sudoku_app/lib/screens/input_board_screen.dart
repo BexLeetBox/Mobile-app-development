@@ -32,6 +32,16 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // You may calculate cellSize based on the screen size, similar to what you did in SudokuBoardWidget
+    double cellSize = MediaQuery.of(context).size.width / 9; // For example
+
+    // Define text style for the cells
+    TextStyle cellTextStyle = TextStyle(
+      fontSize: cellSize / 3, // Or any other appropriate calculation
+      // ... other text style properties if needed
+    );
+
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Input Starting Board'),
@@ -61,10 +71,12 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
             return SudokuCellWidget(
               number: startingBoard[row][col],
               isEditable: true,
+              textStyle: cellTextStyle, // Pass the text style here
               onSaved: (newValue) {
                 setState(() {
                   startingBoard[row][col] = newValue ?? 0;
                 });
+
               },
             );
           },

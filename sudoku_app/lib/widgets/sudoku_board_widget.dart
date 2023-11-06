@@ -9,37 +9,49 @@ class SudokuBoardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get screen size
-    var screenSize = MediaQuery.of(context).size;
+    // Use media query to get screen size
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
 
-    // Calculate the size of the grid
-    double gridWidth = screenSize.width * 0.4; // for example, 80% of screen width
-    double gridHeight = gridWidth; // To maintain the grid aspect ratio
+    // Calculate the maximum board size
+    double maxBoardSize = screenWidth < screenHeight ? screenWidth : screenHeight;
+    double boardSize = maxBoardSize * 0.8; // Use 80% of the smallest screen dimension
+    double cellSize = boardSize / 9; // There are 9 cells in each row and column
 
     return Center(
-      child: Container(
-        width: gridWidth,
-        height: gridHeight,
-        padding: const EdgeInsets.all(16.0), // Add padding around the grid
-        child: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 9,
-            childAspectRatio: 1.0, // Cells are square-shaped
+      // Wrap in an AspectRatio to maintain the square shape
+      child: AspectRatio(
+        aspectRatio: 1,
+        child: Container(
+          // Apply padding to the container
+          padding: const EdgeInsets.all(16.0),
+          // Set a maximum size to the container
+          width: boardSize,
+          height: boardSize,
+          child: GridView.builder(
+            physics: const NeverScrollableScrollPhysics(), // Disables GridView's scrolling
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 9,
+              childAspectRatio: 1, // Maintains the cell as square
+            ),
+            itemCount: 81, // 9x9 Sudoku grid
+            itemBuilder: (context, index) {
+              int row = index ~/ 9;
+              int col = index % 9;
+              return SudokuCellWidget(
+                number: board.board[row][col],
+                isEditable: true, // or some logic to determine if the cell is editable
+                onSaved: (newValue) {
+                  // Implement logic to handle number selection
+                  // and update the board state accordingly
+                  // This will likely require a stateful widget and calling setState
+                },
+                textStyle: TextStyle(
+                  fontSize: cellSize / 3, // Adjust text size relative to cell size
+                ),
+              );
+            },
           ),
-          itemCount: 81, // 9x9 Sudoku grid
-          itemBuilder: (context, index) {
-            int row = index ~/ 9;
-            int col = index % 9;
-            return SudokuCellWidget(
-              number: board.board[row][col],
-              isEditable: true, // or some logic to determine if the cell is editable
-              onSaved: (newValue) {
-                // Implement logic to handle number selection
-                // and update the board state accordingly
-                // This will likely require a stateful widget and calling setState
-              },
-            );
-          },
         ),
       ),
     );
