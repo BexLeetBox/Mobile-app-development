@@ -1,6 +1,7 @@
 // sudoku_cell_widget.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class SudokuCellWidget extends StatelessWidget {
   final int number;
@@ -28,12 +29,7 @@ class SudokuCellWidget extends StatelessWidget {
       initialValue: number == 0 ? '' : number.toString(),
       keyboardType: TextInputType.number,
       textAlign: TextAlign.center,
-      style: TextStyle(
-        fontSize: textSize, // Use the calculated text size
-        color: Colors.black, // Text color
-
-      ),
-
+      style: textStyle,
 
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
@@ -44,19 +40,24 @@ class SudokuCellWidget extends StatelessWidget {
 
       enabled: isEditable,
       onSaved: (value) => onSaved(int.tryParse(value ?? '')),
+
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp('[1-9]')), // Allow numbers 1-9 only
+        LengthLimitingTextInputFormatter(1), // Limit input to a single character
+
+      ],
+
       validator: (value) {
+      // Allow empty strings as a representation of '0'
         if (value == null || value.isEmpty) {
-          return null; // Empty is allowed for unsolved cells
-        }
-        if (int.tryParse(value) == null) {
-          return 'Enter a number'; // Not a number
+          return 'Enter a number'; // Empty field
         }
         if (int.tryParse(value)! < 1 || int.tryParse(value)! > 9) {
-          return '1-9'; // Not in range
+          return '1-9 only'; // Out of range number
         }
-        // Add more Sudoku-specific validation if needed
-        return null;
-      },
+        return null; // No error
+    },
+
     );
   }
 }
