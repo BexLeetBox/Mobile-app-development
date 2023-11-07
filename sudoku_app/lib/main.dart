@@ -56,8 +56,9 @@ class SudokuApp extends StatelessWidget {
             builder: (context) => BoardScreen(difficulty: difficulty),
           );
         } else if (settings.name == '/input') {
+          final Difficulty difficulty = settings.arguments as Difficulty;
           return MaterialPageRoute(
-            builder: (context) => const InputBoardScreen(),
+            builder: (context) => InputBoardScreen(difficulty: difficulty),
           );
         }
         // Define other routes as needed

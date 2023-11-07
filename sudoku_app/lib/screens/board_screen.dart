@@ -11,10 +11,10 @@ class BoardScreen extends StatefulWidget {
   const BoardScreen({Key? key, required this.difficulty}) : super(key: key);
 
   @override
-  _BoardScreenState createState() => _BoardScreenState();
+  BoardScreenState createState() => BoardScreenState();
 }
 
-class _BoardScreenState extends State<BoardScreen> {
+class BoardScreenState extends State<BoardScreen> {
   SudokuBoard? board; // Initially null, will be set in initState
 
   @override
