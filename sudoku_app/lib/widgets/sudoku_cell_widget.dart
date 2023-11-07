@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -54,13 +56,18 @@ class SudokuCellWidgetState extends State<SudokuCellWidget> {
           ],
           validator: (value) {
             if (value == null || value.isEmpty) {
+              debugPrint("Enter a number");
               return 'Enter a number';
             }
             if (int.tryParse(value)! < 1 || int.tryParse(value)! > 9) {
+              debugPrint("1-9 only");
               return '1-9 only';
             }
+
+            debugPrint("very safe");
             return null;
           },
+
         ),
       ),
     );

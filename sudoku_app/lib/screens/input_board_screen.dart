@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sudoku_app/models/difficulty.dart';
 import 'package:sudoku_app/widgets/sudoku_cell_widget.dart';
 
@@ -98,17 +101,55 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
   }
 
   void _saveBoard() async {
-    // TODO: Implement the save logic
-    // This should involve validating the board and then saving it using SudokuStorage
-    // Show a confirmation message or handle errors accordingly
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      // You might want to add logic to check if the board is a valid Sudoku board before saving
-      // For now, let's just save it.
-      await SudokuStorage.saveBoard(
-        SudokuBoard(board: startingBoard, difficulty: widget.difficulty),
+    final isValid = _formKey.currentState?.validate() ?? false;
+    if (isValid) {
+      _formKey.currentState?.save();
+
+      // Convert your 2D list to a single string to save it
+      final String boardString = jsonEncode(startingBoard);
+
+      // Obtain shared preferences
+      final prefs = await SharedPreferences.getInstance();
+
+      // Save the board string along with the difficulty level
+      await prefs.setString('sudoku_board', boardString);
+      await prefs.setString('sudoku_difficulty', widget.difficulty.toString());
+
+      // Show a confirmation message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Board saved successfully')),
       );
-      // Show confirmation or navigate away
+    } else {
+      // Handle the case where the board is not valid
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please fix the errors before saving')),
+      );
     }
   }
+
+
+
+
+  Future<void> _loadBoard() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? boardString = prefs.getString('sudoku_board');
+    final String? difficultyString = prefs.getString('sudoku_difficulty');
+
+    if (boardString != null && difficultyString != null) {
+      List<List<int>> loadedBoard = (jsonDecode(boardString) as List)
+          .map((list) => (list as List).map((item) => item as int).toList())
+          .toList();
+      Difficulty loadedDifficulty = Difficulty.values.firstWhere(
+            (d) => d.toString() == difficultyString,
+        orElse: () => Difficulty.easy,
+      );
+
+      // Now set your loadedBoard and loadedDifficulty to your state
+      setState(() {
+        startingBoard = loadedBoard;
+        // Set any other state you need to with loadedDifficulty
+      });
+    }
+  }
+
 }
