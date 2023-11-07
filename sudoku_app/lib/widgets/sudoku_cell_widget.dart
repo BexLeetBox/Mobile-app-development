@@ -8,6 +8,7 @@ class SudokuCellWidget extends StatefulWidget {
   final bool isEditable;
   final Function(int?) onSaved; // Callback to save the input number
   final TextStyle textStyle;
+  final Function(int) onChanged;
 
   const SudokuCellWidget({
     Key? key,
@@ -15,6 +16,7 @@ class SudokuCellWidget extends StatefulWidget {
     this.isEditable = true,
     required this.onSaved,
     required this.textStyle,
+    required this.onChanged,
   }) : super(key: key);
 
   @override
@@ -23,6 +25,18 @@ class SudokuCellWidget extends StatefulWidget {
 
 class SudokuCellWidgetState extends State<SudokuCellWidget> {
   bool _isUncertain = false; // State to keep track of uncertainty
+
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
 
   void _toggleUncertain() {
     setState(() {
@@ -44,12 +58,17 @@ class SudokuCellWidgetState extends State<SudokuCellWidget> {
           keyboardType: TextInputType.number,
           textAlign: TextAlign.center,
           style: widget.textStyle.copyWith(color: _isUncertain ? Colors.white : Colors.black), // Change text color based on uncertainty
+          onChanged: (value) {
+            widget.onChanged(int.tryParse(value) ?? 0);
+          },
           decoration: const InputDecoration(
             border: InputBorder.none,
             hintText: '0',
           ),
           enabled: widget.isEditable,
-          onSaved: (value) => widget.onSaved(int.tryParse(value ?? '')),
+          //TODO considering to remove this
+          /*onSaved: (value) => widget.onSaved(int.tryParse(value ?? '')),*/
+
           inputFormatters: [
             FilteringTextInputFormatter.allow(RegExp('[1-9]')),
             LengthLimitingTextInputFormatter(1),

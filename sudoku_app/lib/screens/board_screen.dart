@@ -31,6 +31,17 @@ class BoardScreenState extends State<BoardScreen> {
     });
   }
 
+
+// Define the callback function that will be passed to SudokuBoardWidget
+  void _onCellChanged(int row, int col, int newValue) {
+    // Update the board with the new value
+    setState(() {
+      board!.board[row][col] = newValue;
+    });
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     // Show a loading indicator while the board is null
@@ -44,11 +55,15 @@ class BoardScreenState extends State<BoardScreen> {
     }
 
     // Once the board is loaded, show it
+    // Once the board is loaded, show it
     return Scaffold(
       appBar: AppBar(
         title: Text('Sudoku - ${widget.difficulty.toString().split('.').last}'),
       ),
-      body: SudokuBoardWidget(board: board!),
+      body: SudokuBoardWidget(
+        board: board!,
+        onCellChanged: _onCellChanged, // Pass the callback function here
+      ),
     );
   }
 }

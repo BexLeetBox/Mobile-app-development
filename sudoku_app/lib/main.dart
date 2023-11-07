@@ -97,6 +97,13 @@ class _SudokuHomePageState extends State<SudokuHomePage> {
     _generateBoard(); // Call _generateBoard to reset the board
   }
 
+  // Define the callback function that will be passed to SudokuBoardWidget
+  void _onCellChanged(int row, int col, int newValue) {
+    // Update the board with the new value
+    setState(() {
+      board!.board[row][col] = newValue;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +124,10 @@ class _SudokuHomePageState extends State<SudokuHomePage> {
       appBar: AppBar(
         title: Text('Sudoku - ${board!.difficulty.toString().split('.').last}'),
       ),
-      body: SudokuBoardWidget(board: board!),
+      body: SudokuBoardWidget(
+        board: board!,
+        onCellChanged: _onCellChanged, // Pass the callback function here
+      ),
     );
   }
 }

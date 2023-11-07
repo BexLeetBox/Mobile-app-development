@@ -5,8 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sudoku_app/models/difficulty.dart';
 import 'package:sudoku_app/widgets/sudoku_cell_widget.dart';
 
-import '../model/sudoku_board.dart';
-import '../storage/sudoku_storage.dart';
+
 
 class InputBoardScreen extends StatefulWidget {
   final Difficulty difficulty;
@@ -45,7 +44,7 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.save),
-            onPressed: _saveBoard, // Reference to the method that saves the board
+            onPressed: _saveBoard,
           ),
         ],
       ),
@@ -75,7 +74,16 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
                         int newNumber = newValue ?? 0;
                         setState(() {
                           startingBoard[row][col] = newNumber;
+                          //TODO remove when finishing project
+                          printCurrentGridValues();
                         });
+                      },
+                      onChanged: (newValue) {
+                        int newNumber = newValue ?? 0;
+                        setState(() {
+                          startingBoard[row][col] = newNumber;
+                        });
+                        printCurrentGridValues();
                       },
                     );
                   },
@@ -90,17 +98,21 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(160, 50), // Full-width button with a fixed height
                 padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-              ), // Implement this method to handle the saving logic
+              ),
               child: const Text('Save Board'),
             ),
           ),
         ],
       ),
-
     );
   }
 
+
   void _saveBoard() async {
+    printCurrentGridValues();
+
+
+
     final isValid = _formKey.currentState?.validate() ?? false;
     if (isValid) {
       _formKey.currentState?.save();
@@ -152,4 +164,15 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
     }
   }
 
+
+
+  void printCurrentGridValues() {
+    for (var row in startingBoard) {
+      print(row); // This will print each row of the grid
+    }
+    print("-----------------------"); // Just to separate each print statement for clarity
+  }
+
 }
+
+

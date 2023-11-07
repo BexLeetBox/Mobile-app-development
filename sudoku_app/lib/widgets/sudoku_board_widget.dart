@@ -4,8 +4,14 @@ import '../model/sudoku_board.dart';
 
 class SudokuBoardWidget extends StatelessWidget {
   final SudokuBoard board;
+  final Function(int, int, int) onCellChanged;
 
-  const SudokuBoardWidget({Key? key, required this.board}) : super(key: key);
+  const SudokuBoardWidget({
+    Key? key,
+    required this.board,
+    required this.onCellChanged, // Add this line
+  }) : super(key: key);
+
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +47,10 @@ class SudokuBoardWidget extends StatelessWidget {
               return SudokuCellWidget(
                 number: board.board[row][col],
                 isEditable: true, // or some logic to determine if the cell is editable
+                onChanged: (newValue) {
+                  // Pass the new value and cell position to the onCellChanged callback
+                  onCellChanged(row, col, newValue);
+                },
                 onSaved: (newValue) {
                   // Implement logic to handle number selection
                   // and update the board state accordingly
