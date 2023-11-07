@@ -46,36 +46,54 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
           ),
         ],
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: maxBoardDimension,
-            maxHeight: maxBoardHeight,
-          ),
-          child: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 9,
-              childAspectRatio: 1.0,
+      body: Column(
+        children: [
+          Expanded(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: maxBoardDimension,
+                  maxHeight: maxBoardHeight,
+                ),
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 9,
+                    childAspectRatio: 1.0,
+                  ),
+                  itemCount: 81,
+                  itemBuilder: (context, index) {
+                    int row = index ~/ 9;
+                    int col = index % 9;
+                    return SudokuCellWidget(
+                      number: startingBoard[row][col],
+                      isEditable: true,
+                      textStyle: cellTextStyle,
+                      onSaved: (newValue) {
+                        int newNumber = newValue ?? 0;
+                        setState(() {
+                          startingBoard[row][col] = newNumber;
+                        });
+                      },
+                    );
+                  },
+                ),
+              ),
             ),
-            itemCount: 81,
-            itemBuilder: (context, index) {
-              int row = index ~/ 9;
-              int col = index % 9;
-              return SudokuCellWidget(
-                number: startingBoard[row][col],
-                isEditable: true,
-                textStyle: cellTextStyle,
-                onSaved: (newValue) {
-                  setState(() {
-                    startingBoard[row][col] = newValue ?? 0;
-                  });
-
-                },
-              );
-            },
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton(
+              onPressed: _saveBoard,
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(160, 50), // Full-width button with a fixed height
+                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+              ), // Implement this method to handle the saving logic
+              child: const Text('Save Board'),
+            ),
+          ),
+        ],
       ),
+
     );
   }
 
