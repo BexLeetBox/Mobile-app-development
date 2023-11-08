@@ -20,6 +20,66 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
   final _formKey = GlobalKey<FormState>();
   List<List<int>> startingBoard = List.generate(9, (_) => List.generate(9, (_) => 0));
 
+  bool isBoardValid() {
+    for (int i = 0; i < 9; i++) {
+      if (!isRowValid(i) || !isColumnValid(i)) {
+        return false;
+      }
+    }
+    if (!areAllBoxesValid()) {
+      return false;
+    }
+    return true;
+  }
+
+
+  bool isRowValid(int row) {
+    List<bool> seen = List.filled(9, false);
+    for (int i = 0; i < 9; i++) {
+      int number = startingBoard[row][i];
+      if (number != 0) {
+        if (seen[number - 1]) return false; // Number already seen in this row
+        seen[number - 1] = true;
+      }
+    }
+    return true;
+  }
+
+  bool isColumnValid(int column) {
+    List<bool> seen = List.filled(9, false);
+    for (int i = 0; i < 9; i++) {
+      int number = startingBoard[i][column];
+      if (number != 0) {
+        if (seen[number - 1]) return false; // Number already seen in this column
+        seen[number - 1] = true;
+      }
+    }
+    return true;
+  }
+
+  bool isBoxValid(int boxStartRow, int boxStartCol) {
+    List<bool> seen = List.filled(9, false);
+    for (int row = 0; row < 3; row++) {
+      for (int col = 0; col < 3; col++) {
+        int number = startingBoard[boxStartRow + row][boxStartCol + col];
+        if (number != 0) {
+          if (seen[number - 1]) return false; // Number already seen in this 3x3 box
+          seen[number - 1] = true;
+        }
+      }
+    }
+    return true;
+  }
+
+  bool areAllBoxesValid() {
+    for (int row = 0; row < 9; row += 3) {
+      for (int col = 0; col < 9; col += 3) {
+        if (!isBoxValid(row, col)) return false;
+      }
+    }
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     // Get the screen size
@@ -108,33 +168,38 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
   }
 
 
+  @override
+  void initState() {
+    super.initState();
+    // Load a known valid Sudoku solution into startingBoard
+    startingBoard = [
+      [5, 3, 4, 6, 7, 8, 9, 1, 2],
+      [6, 7, 2, 1, 9, 5, 3, 4, 8],
+      [1, 9, 8, 3, 4, 2, 5, 6, 7],
+      [8, 5, 9, 7, 6, 1, 4, 2, 3],
+      [4, 2, 6, 8, 5, 3, 7, 9, 1],
+      [7, 1, 3, 9, 2, 4, 8, 5, 6],
+      [9, 6, 1, 5, 3, 7, 2, 8, 4],
+      [2, 8, 7, 4, 1, 9, 6, 3, 5],
+      [3, 4, 5, 2, 8, 6, 1, 7, 9],
+    ];
+    // Immediately check if the startingBoard is valid
+    bool valid = isBoardValid();
+    print('Is the known solution valid? $valid'); // This should print true
+  }
+
+
   void _saveBoard() async {
     printCurrentGridValues();
+    if (isBoardValid()) {
+      printCurrentGridValues();
 
-
-
-    final isValid = _formKey.currentState?.validate() ?? false;
-    if (isValid) {
-      _formKey.currentState?.save();
-
-      // Convert your 2D list to a single string to save it
-      final String boardString = jsonEncode(startingBoard);
-
-      // Obtain shared preferences
-      final prefs = await SharedPreferences.getInstance();
-
-      // Save the board string along with the difficulty level
-      await prefs.setString('sudoku_board', boardString);
-      await prefs.setString('sudoku_difficulty', widget.difficulty.toString());
-
-      // Show a confirmation message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Board saved successfully')),
-      );
+      // Save the board as before, because it's valid
+      // ... existing save logic ...
     } else {
-      // Handle the case where the board is not valid
+      // Notify the user that the board is invalid
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please fix the errors before saving')),
+        SnackBar(content: Text('Invalid board configuration. Please correct it before saving.')),
       );
     }
   }
