@@ -1,5 +1,9 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../model/sudoku_board.dart';
 import '../models/difficulty.dart';
 import 'board_screen.dart';
 import 'input_board_screen.dart'; // Assume this is the screen where the user can create a new board
@@ -62,26 +66,46 @@ class HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _loadGameForDifficulty(Difficulty difficulty) {
-    // Implement the logic to load a game for the given difficulty
-    // This could involve reading from local storage or a database
-    // For example:
-    // SudokuBoard board = _getBoardFromStorage(difficulty);
-    // Navigator.push(context, MaterialPageRoute(
-    //   builder: (context) => BoardScreen(board: board),
-    // ));
+  Future<void> _loadGameForDifficulty(Difficulty difficulty) async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? boardJson = prefs.getString('sudoku_board');
+    final String? savedDifficulty = prefs.getString('sudoku_difficulty');
+
+    print('Board JSON: $boardJson');
+    print('Saved Difficulty: $savedDifficulty');
+
+    // Check if a saved game exists and matches the selected difficulty
+    if (boardJson != null && savedDifficulty == difficulty.toString()) {
+      // Decode the board
+      SudokuBoard loadedBoard = SudokuBoard.fromJson(jsonDecode(boardJson));
+
+      // Navigate to the BoardScreen with the loaded board
+      Navigator.push(context, MaterialPageRoute(
+        builder: (context) => BoardScreen(
+          difficulty: difficulty,
+          initialBoard: loadedBoard, // Pass the loaded board
+        ),
+      ));
+    } else {
+      // Show a message that no saved game is available
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No saved game available for ${difficulty.toString().split('.').last} difficulty.'),
+          backgroundColor: Colors.blue, // Information message in blue
+        ),
+      );
+    }
   }
 }
 
-// Extension to capitalize the difficulty strings for display
-extension on String {
-  String capitalize() {
-    return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
-  }
+    // Extension to capitalize the difficulty strings for display
+    extension on String {
+    String capitalize() {
+      return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
+    }
+
+
 }
-
-
-
 
 
 

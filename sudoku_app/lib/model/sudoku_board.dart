@@ -2,7 +2,7 @@
 import '../models/difficulty.dart';
 
 class SudokuBoard {
-  final List<List<int>> board;
+  final List<List<int?>> board;
   final Difficulty difficulty;
 
   // Constructor that takes both board and difficulty
@@ -13,6 +13,21 @@ class SudokuBoard {
     // Actual logic to generate a Sudoku board based on difficulty
     // Placeholder for demonstration purposes
     return List.generate(9, (_) => List.generate(9, (_) => 0));
+  }
+
+  // Constructor to create a board from a JSON map
+  factory SudokuBoard.fromJson(Map<String, dynamic> jsonMap) {
+    List<List<int?>> board = (jsonMap['board'] as List)
+        .map((row) => (row as List).map((item) => item as int?).toList())
+        .toList();
+
+    // Assuming 'difficulty' is also stored as a string in the JSON
+    Difficulty difficulty = Difficulty.values.firstWhere(
+          (d) => d.toString() == jsonMap['difficulty'],
+      orElse: () => Difficulty.easy, // Provide a default value or handle this case appropriately
+    );
+
+    return SudokuBoard(board: board, difficulty: difficulty);
   }
 
   // Convert a SudokuBoard to a Map
@@ -35,6 +50,8 @@ class SudokuBoard {
       ),
     );
   }
+
+
 
 // ... other methods and properties ...
 }

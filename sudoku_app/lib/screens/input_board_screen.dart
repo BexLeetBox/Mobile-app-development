@@ -172,7 +172,7 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
   @override
   void initState() {
     super.initState();
-
+    /**
     // Load a known valid Sudoku solution into startingBoard
     startingBoard = [
       [5, 3, 4, 6, 7, 8, 9, 1, 2],
@@ -188,15 +188,28 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
     // Immediately check if the startingBoard is valid
     bool valid = isBoardValid();
     print('Is the known solution valid? $valid'); // This should print true
-
+ **/
   }
 
 
   void _saveBoard() async {
     printCurrentGridValues();
     if (isBoardValid()) {
-      // Save the board because it's valid
+
       // ... existing save logic ...
+      // Serialize the board and difficulty to JSON
+      String boardJson = jsonEncode({
+        'board': startingBoard.map((row) => row.map((number) => number ?? 0).toList()).toList(),
+        'difficulty': widget.difficulty.toString(),
+      });
+
+      // Obtain shared preferences
+      final prefs = await SharedPreferences.getInstance();
+
+      // Save the board string and difficulty level
+      await prefs.setString('sudoku_board', boardJson);
+
+
 
       // Display a success message with green background
       ScaffoldMessenger.of(context).showSnackBar(

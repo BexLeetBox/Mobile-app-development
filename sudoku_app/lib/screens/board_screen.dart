@@ -7,8 +7,14 @@ import '../widgets/sudoku_board_widget.dart';
 
 class BoardScreen extends StatefulWidget {
   final Difficulty difficulty;
+  final SudokuBoard? initialBoard;
 
-  const BoardScreen({Key? key, required this.difficulty}) : super(key: key);
+  const BoardScreen({
+    Key? key,
+    required this.difficulty,
+    this.initialBoard, // Add this line
+  }) : super(key: key);
+
 
   @override
   BoardScreenState createState() => BoardScreenState();
@@ -20,7 +26,15 @@ class BoardScreenState extends State<BoardScreen> {
   @override
   void initState() {
     super.initState();
-    _generateBoard();
+    if (widget.initialBoard != null) {
+      // If an initial board is provided, use it
+      setState(() {
+        board = widget.initialBoard;
+      });
+    } else {
+      // Otherwise, generate a new board
+      _generateBoard();
+    }
   }
 
   Future<void> _generateBoard() async {
