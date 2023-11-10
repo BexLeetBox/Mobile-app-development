@@ -4,15 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class SudokuCellWidget extends StatefulWidget {
-  final int number;
+  final int? number;
   final bool isEditable;
   final Function(int?) onSaved; // Callback to save the input number
   final TextStyle textStyle;
-  final Function(int) onChanged;
+  final Function(int?) onChanged;
 
   const SudokuCellWidget({
     Key? key,
-    required this.number,
+    required this.number, // No longer required, can be null
     this.isEditable = true,
     required this.onSaved,
     required this.textStyle,
@@ -54,16 +54,17 @@ class SudokuCellWidgetState extends State<SudokuCellWidget> {
           border: Border.all(color: Colors.black38),
         ),
         child: TextFormField(
-          initialValue: widget.number == 0 ? '' : widget.number.toString(),
+          initialValue: widget.number?.toString() ?? '',
           keyboardType: TextInputType.number,
           textAlign: TextAlign.center,
           style: widget.textStyle.copyWith(color: _isUncertain ? Colors.white : Colors.black), // Change text color based on uncertainty
           onChanged: (value) {
-            widget.onChanged(int.tryParse(value) ?? 0);
+            int? newValue = value.isNotEmpty ? int.tryParse(value) : null;
+            widget.onChanged(newValue);
           },
           decoration: const InputDecoration(
             border: InputBorder.none,
-            hintText: '0',
+            hintText: '',
           ),
           enabled: widget.isEditable,
           //TODO considering to remove this

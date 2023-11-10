@@ -33,12 +33,20 @@ class BoardScreenState extends State<BoardScreen> {
 
 
 // Define the callback function that will be passed to SudokuBoardWidget
-  void _onCellChanged(int row, int col, int newValue) {
-    // Update the board with the new value
+  void _onCellChanged(int row, int col, int? newValue) {
+    // Update the board with the new value, which may be null
     setState(() {
-      board!.board[row][col] = newValue;
+      // Make sure to handle the case where newValue is null
+      if (newValue != null) {
+        board!.board[row][col] = newValue;
+      } else {
+        // Handle the cell clearing logic here, if newValue is null
+        // For example, you might set it to a default value or keep it null
+        board!.board[row][col] = 0; // or some other default value
+      }
     });
   }
+
 
 
 

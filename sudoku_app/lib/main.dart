@@ -98,10 +98,10 @@ class _SudokuHomePageState extends State<SudokuHomePage> {
   }
 
   // Define the callback function that will be passed to SudokuBoardWidget
-  void _onCellChanged(int row, int col, int newValue) {
+  void _onCellChanged(int row, int col, int? newValue) {
     // Update the board with the new value
     setState(() {
-      board!.board[row][col] = newValue;
+      board!.board[row][col] = newValue!;
     });
   }
 

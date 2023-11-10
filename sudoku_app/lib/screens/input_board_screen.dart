@@ -18,7 +18,8 @@ class InputBoardScreen extends StatefulWidget {
 
 class _InputBoardScreenState extends State<InputBoardScreen> {
   final _formKey = GlobalKey<FormState>();
-  List<List<int>> startingBoard = List.generate(9, (_) => List.generate(9, (_) => 0));
+  List<List<int?>> startingBoard = List.generate(9, (_) => List.filled(9, null));
+
 
   bool isBoardValid() {
     for (int i = 0; i < 9; i++) {
@@ -36,9 +37,9 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
   bool isRowValid(int row) {
     List<bool> seen = List.filled(9, false);
     for (int i = 0; i < 9; i++) {
-      int number = startingBoard[row][i];
-      if (number != 0) {
-        if (seen[number - 1]) return false; // Number already seen in this row
+      int? number = startingBoard[row][i]; // This is now a nullable int
+      if (number != null) {
+        if (seen[number - 1]) return false;
         seen[number - 1] = true;
       }
     }
@@ -48,8 +49,8 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
   bool isColumnValid(int column) {
     List<bool> seen = List.filled(9, false);
     for (int i = 0; i < 9; i++) {
-      int number = startingBoard[i][column];
-      if (number != 0) {
+      int? number = startingBoard[i][column];
+      if (number != null) {
         if (seen[number - 1]) return false; // Number already seen in this column
         seen[number - 1] = true;
       }
@@ -61,8 +62,8 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
     List<bool> seen = List.filled(9, false);
     for (int row = 0; row < 3; row++) {
       for (int col = 0; col < 3; col++) {
-        int number = startingBoard[boxStartRow + row][boxStartCol + col];
-        if (number != 0) {
+        int? number = startingBoard[boxStartRow + row][boxStartCol + col];
+        if (number != null) {
           if (seen[number - 1]) return false; // Number already seen in this 3x3 box
           seen[number - 1] = true;
         }
@@ -138,8 +139,8 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
                           printCurrentGridValues();
                         });
                       },
-                      onChanged: (newValue) {
-                        int newNumber = newValue ?? 0;
+                      onChanged: (int? newValue) {
+                        int? newNumber = newValue;
                         setState(() {
                           startingBoard[row][col] = newNumber;
                         });
@@ -171,6 +172,7 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
   @override
   void initState() {
     super.initState();
+
     // Load a known valid Sudoku solution into startingBoard
     startingBoard = [
       [5, 3, 4, 6, 7, 8, 9, 1, 2],
@@ -186,6 +188,7 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
     // Immediately check if the startingBoard is valid
     bool valid = isBoardValid();
     print('Is the known solution valid? $valid'); // This should print true
+
   }
 
 
