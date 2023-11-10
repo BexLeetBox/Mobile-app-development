@@ -192,17 +192,27 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
   void _saveBoard() async {
     printCurrentGridValues();
     if (isBoardValid()) {
-      printCurrentGridValues();
-
-      // Save the board as before, because it's valid
+      // Save the board because it's valid
       // ... existing save logic ...
-    } else {
-      // Notify the user that the board is invalid
+
+      // Display a success message with green background
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Invalid board configuration. Please correct it before saving.')),
+        SnackBar(
+          content: Text('Board saved successfully for ${widget.difficulty.toString().split('.').last} difficulty.'),
+          backgroundColor: Colors.green, // Success message in green
+        ),
+      );
+    } else {
+      // Notify the user that the board is invalid with a red background
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Invalid board configuration. Please correct it before saving.'),
+          backgroundColor: Colors.red, // Error message in red
+        ),
       );
     }
   }
+
 
 
 
