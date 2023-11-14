@@ -193,41 +193,41 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
 
 
   void _saveBoard() async {
-    printCurrentGridValues();
     if (isBoardValid()) {
-
-      // ... existing save logic ...
-      // Serialize the board and difficulty to JSON
-      String boardJson = jsonEncode({
-        'board': startingBoard.map((row) => row.map((number) => number).toList()).toList(),
-        'difficulty': widget.difficulty.toString(),
-      });
-
-      // Obtain shared preferences
+      String boardKey = 'sudoku_boards_${widget.difficulty.toString()}';
       final prefs = await SharedPreferences.getInstance();
 
-      // Save the board string and difficulty level
-      await prefs.setString('sudoku_board', boardJson);
+      // Fetch the current list of boards for the difficulty, or initialize an empty list
+      List<String> boards = prefs.getStringList(boardKey) ?? [];
 
+      // Serialize the current board to JSON
+      String currentBoardJson = jsonEncode({
+        'board': startingBoard.map((row) => row.map((number) => number ?? 0).toList()).toList(),
+      });
 
+      // Add the current board JSON to the list
+      boards.add(currentBoardJson);
 
-      // Display a success message with green background
+      // Save the updated list back to shared preferences
+      await prefs.setStringList(boardKey, boards);
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Board saved successfully for ${widget.difficulty.toString().split('.').last} difficulty.'),
-          backgroundColor: Colors.green, // Success message in green
+          backgroundColor: Colors.green,
         ),
       );
     } else {
-      // Notify the user that the board is invalid with a red background
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Invalid board configuration. Please correct it before saving.'),
-          backgroundColor: Colors.red, // Error message in red
+          backgroundColor: Colors.red,
         ),
       );
     }
   }
+
+
 
 
 

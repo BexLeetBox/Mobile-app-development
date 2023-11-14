@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -68,52 +69,35 @@ class HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadGameForDifficulty(Difficulty difficulty) async {
     final prefs = await SharedPreferences.getInstance();
-    final String? boardJson = prefs.getString('sudoku_board');
+    String boardKey = 'sudoku_boards_${difficulty.toString()}'; // Updated key to reflect list of boards
+    List<String>? boardJsonList = prefs.getStringList(boardKey); // Fetch the list of boards
 
-    print('Board JSON: $boardJson');
-
-    if (boardJson != null) {
-      // Decode the board
+    print('boardJson: $boardJsonList');
+    // Check if there's any saved game for the selected difficulty
+    if (boardJsonList != null && boardJsonList.isNotEmpty) {
+      // Select a random board JSON from the list
+      int randomIndex = Random().nextInt(boardJsonList.length);
+      String boardJson = boardJsonList[randomIndex];
       Map<String, dynamic> boardData = jsonDecode(boardJson);
       SudokuBoard loadedBoard = SudokuBoard.fromJson(boardData);
 
-      // Extract the difficulty from the board JSON
-      String? loadedDifficultyString = boardData['difficulty'];
-      Difficulty loadedDifficulty = Difficulty.values.firstWhere(
-            (d) => d.toString() == loadedDifficultyString,
-        orElse: () => Difficulty.easy, // or handle this case appropriately
-      );
-
-      print('Loaded Difficulty: $loadedDifficulty');
-
-      // Check if the loaded difficulty matches the selected difficulty
-      if (loadedDifficulty == difficulty) {
-        // Navigate to the BoardScreen with the loaded board
-        Navigator.push(context, MaterialPageRoute(
-          builder: (context) => BoardScreen(
-            difficulty: loadedDifficulty,
-            initialBoard: loadedBoard,
-          ),
-        ));
-      } else {
-        // Show a message that no saved game is available for the selected difficulty
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('No saved game available for ${difficulty.toString().split('.').last} difficulty.'),
-            backgroundColor: Colors.blue,
-          ),
-        );
-      }
+      // Navigate to the BoardScreen with the loaded board
+      Navigator.push(context, MaterialPageRoute(
+        builder: (context) => BoardScreen(
+          difficulty: difficulty,
+          initialBoard: loadedBoard,
+        ),
+      ));
     } else {
-      // Show a message that no saved game is available
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('No saved game available.'),
+          content: Text('No saved game available for ${difficulty.toString().split('.').last} difficulty.'),
           backgroundColor: Colors.blue,
         ),
       );
     }
   }
+
 
 }
 
