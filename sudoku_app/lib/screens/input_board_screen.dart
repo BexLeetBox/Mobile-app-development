@@ -199,7 +199,7 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
       // ... existing save logic ...
       // Serialize the board and difficulty to JSON
       String boardJson = jsonEncode({
-        'board': startingBoard.map((row) => row.map((number) => number ?? 0).toList()).toList(),
+        'board': startingBoard.map((row) => row.map((number) => number).toList()).toList(),
         'difficulty': widget.difficulty.toString(),
       });
 

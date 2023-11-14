@@ -56,7 +56,7 @@ class BoardScreenState extends State<BoardScreen> {
       } else {
         // Handle the cell clearing logic here, if newValue is null
         // For example, you might set it to a default value or keep it null
-        board!.board[row][col] = 0; // or some other default value
+        board!.board[row][col] = null; // or some other default value
       }
     });
   }
