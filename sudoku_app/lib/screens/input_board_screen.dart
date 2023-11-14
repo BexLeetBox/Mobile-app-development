@@ -202,7 +202,7 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
 
       // Serialize the current board to JSON
       String currentBoardJson = jsonEncode({
-        'board': startingBoard.map((row) => row.map((number) => number ?? 0).toList()).toList(),
+        'board': startingBoard.map((row) => row.map((number) => number ?? null).toList()).toList(),
       });
 
       // Add the current board JSON to the list
