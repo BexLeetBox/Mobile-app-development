@@ -69,33 +69,52 @@ class HomeScreenState extends State<HomeScreen> {
   Future<void> _loadGameForDifficulty(Difficulty difficulty) async {
     final prefs = await SharedPreferences.getInstance();
     final String? boardJson = prefs.getString('sudoku_board');
-    final String? savedDifficulty = prefs.getString('sudoku_difficulty');
 
     print('Board JSON: $boardJson');
-    print('Saved Difficulty: $savedDifficulty');
 
-    // Check if a saved game exists and matches the selected difficulty
-    if (boardJson != null && savedDifficulty == difficulty.toString()) {
+    if (boardJson != null) {
       // Decode the board
-      SudokuBoard loadedBoard = SudokuBoard.fromJson(jsonDecode(boardJson));
+      Map<String, dynamic> boardData = jsonDecode(boardJson);
+      SudokuBoard loadedBoard = SudokuBoard.fromJson(boardData);
 
-      // Navigate to the BoardScreen with the loaded board
-      Navigator.push(context, MaterialPageRoute(
-        builder: (context) => BoardScreen(
-          difficulty: difficulty,
-          initialBoard: loadedBoard, // Pass the loaded board
-        ),
-      ));
+      // Extract the difficulty from the board JSON
+      String? loadedDifficultyString = boardData['difficulty'];
+      Difficulty loadedDifficulty = Difficulty.values.firstWhere(
+            (d) => d.toString() == loadedDifficultyString,
+        orElse: () => Difficulty.easy, // or handle this case appropriately
+      );
+
+      print('Loaded Difficulty: $loadedDifficulty');
+
+      // Check if the loaded difficulty matches the selected difficulty
+      if (loadedDifficulty == difficulty) {
+        // Navigate to the BoardScreen with the loaded board
+        Navigator.push(context, MaterialPageRoute(
+          builder: (context) => BoardScreen(
+            difficulty: loadedDifficulty,
+            initialBoard: loadedBoard,
+          ),
+        ));
+      } else {
+        // Show a message that no saved game is available for the selected difficulty
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('No saved game available for ${difficulty.toString().split('.').last} difficulty.'),
+            backgroundColor: Colors.blue,
+          ),
+        );
+      }
     } else {
       // Show a message that no saved game is available
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('No saved game available for ${difficulty.toString().split('.').last} difficulty.'),
-          backgroundColor: Colors.blue, // Information message in blue
+          content: Text('No saved game available.'),
+          backgroundColor: Colors.blue,
         ),
       );
     }
   }
+
 }
 
     // Extension to capitalize the difficulty strings for display
