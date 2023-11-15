@@ -172,7 +172,7 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
   @override
   void initState() {
     super.initState();
-    /**
+
     // Load a known valid Sudoku solution into startingBoard
     startingBoard = [
       [5, 3, 4, 6, 7, 8, 9, 1, 2],
@@ -188,7 +188,7 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
     // Immediately check if the startingBoard is valid
     bool valid = isBoardValid();
     print('Is the known solution valid? $valid'); // This should print true
- **/
+
   }
 
 
@@ -219,7 +219,7 @@ class _InputBoardScreenState extends State<InputBoardScreen> {
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Invalid board configuration. Please correct it before saving.'),
           backgroundColor: Colors.red,
         ),
