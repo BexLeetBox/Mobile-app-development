@@ -30,36 +30,56 @@ class HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            DropdownButton<Difficulty>(
-              value: _selectedDifficulty,
-              onChanged: (Difficulty? newValue) {
-                setState(() {
-                  _selectedDifficulty = newValue ?? Difficulty.easy;
-                });
-              },
-              items: Difficulty.values.map((Difficulty difficulty) {
-                return DropdownMenuItem<Difficulty>(
-                  value: difficulty,
-                  child: Text(difficulty.toString().split('.').last.capitalize()),
-                );
-              }).toList(),
+            Container(
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.white10.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 2,
+                    offset: Offset(0, 3), // changes position of shadow
+                  ),
+                ],
+              ),
+              child: DropdownButton<Difficulty>(
+                value: _selectedDifficulty,
+                onChanged: (Difficulty? newValue) {
+                  setState(() {
+                    _selectedDifficulty = newValue ?? Difficulty.easy;
+                  });
+                },
+                items: Difficulty.values.map((Difficulty difficulty) {
+                  return DropdownMenuItem<Difficulty>(
+                    value: difficulty,
+                    child: Text(difficulty.toString().split('.').last.capitalize()),
+                  );
+                }).toList(),
+              ),
             ),
-            ElevatedButton(
-              onPressed: () {
-                // Logic to load a game for the selected difficulty
-                _loadGameForDifficulty(_selectedDifficulty);
-              },
-              child: const Text('Load Game'),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0), // Add vertical padding
+              child: ElevatedButton(
+                onPressed: () {
+                  // Logic to load a game for the selected difficulty
+                  _loadGameForDifficulty(_selectedDifficulty);
+                },
+                child: const Text('Load Game'),
+              ),
             ),
-            ElevatedButton(
-              onPressed: () {
-                // Navigate to the screen to create a new board
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (context) => InputBoardScreen(difficulty: _selectedDifficulty),
-                ));
-              },
-              child: const Text('Create Game'),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0), // Add vertical padding
+              child: ElevatedButton(
+                onPressed: () {
+                  // Navigate to the screen to create a new board
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => InputBoardScreen(difficulty: _selectedDifficulty),
+                  ));
+                },
+                child: const Text('Create Game'),
+              ),
             ),
+
             // ... Keep the existing buttons for starting a game ...
           ],
         ),

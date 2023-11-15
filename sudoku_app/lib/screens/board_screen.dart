@@ -186,10 +186,18 @@ class BoardScreenState extends State<BoardScreen> {
               onCellChanged: _onCellChanged,
             ),
           ),
-          ElevatedButton(
-            onPressed: _checkSolution, // Call _checkSolution here
-            child: const Text('Check Solution'),
-          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton(
+              onPressed: _checkSolution, // Call _checkSolution here
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(160, 50), // Full-width button with a fixed height
+                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+              ),
+              child: const Text('Check Solution'),
+            ),
+
+          )
         ],
       ),
     );
