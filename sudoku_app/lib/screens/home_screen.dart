@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../main.dart';
 import '../model/sudoku_board.dart';
 import '../models/difficulty.dart';
 import 'board_screen.dart';
@@ -23,9 +24,7 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sudoku Home'),
-      ),
+      appBar: buildAppBar(context), // Use the custom AppBar
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

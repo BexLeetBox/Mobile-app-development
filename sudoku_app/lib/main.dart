@@ -29,17 +29,30 @@ void main() {
       return null;
     },
   );
-
-
 }
 
-
-class SudokuApp extends StatelessWidget {
+class SudokuApp extends StatefulWidget {
   const SudokuApp({Key? key}) : super(key: key);
+
+  static _SudokuAppState? of(BuildContext context) => context.findAncestorStateOfType<_SudokuAppState>();
+
+  @override
+  _SudokuAppState createState() => _SudokuAppState();
+}
+
+class _SudokuAppState extends State<SudokuApp> {
+  Locale _currentLocale = const Locale('en', ''); // Default to English
+
+  void setLocale(Locale locale) {
+    setState(() {
+      _currentLocale = locale;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false, // Add this line to hide the debug banner
       title: 'Sudoku App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -49,24 +62,25 @@ class SudokuApp extends StatelessWidget {
         '/': (context) => const HomeScreen(),
       },
       onGenerateRoute: (settings) {
-        // Handle any routes with arguments here
-        if (settings.name == '/board') {
-          final Difficulty difficulty = settings.arguments as Difficulty;
-          return MaterialPageRoute(
-            builder: (context) => BoardScreen(difficulty: difficulty),
-          );
-        } else if (settings.name == '/input') {
-          final Difficulty difficulty = settings.arguments as Difficulty;
-          return MaterialPageRoute(
-            builder: (context) => InputBoardScreen(difficulty: difficulty),
-          );
+        switch (settings.name) {
+          case '/board':
+            final Difficulty difficulty = settings.arguments as Difficulty;
+            return MaterialPageRoute(
+              builder: (context) => BoardScreen(difficulty: difficulty),
+            );
+          case '/input':
+            final Difficulty difficulty = settings.arguments as Difficulty;
+            return MaterialPageRoute(
+              builder: (context) => InputBoardScreen(difficulty: difficulty),
+            );
+          default:
+            return MaterialPageRoute(builder: (context) => const HomeScreen());
         }
-        // Define other routes as needed
-        return null; // Implement error handling for undefined routes
       },
     );
   }
 }
+
 
 class SudokuHomePage extends StatefulWidget {
   const SudokuHomePage({Key? key}) : super(key: key);
@@ -130,4 +144,22 @@ class _SudokuHomePageState extends State<SudokuHomePage> {
       ),
     );
   }
+}
+
+
+AppBar buildAppBar(BuildContext context) {
+  return AppBar(
+    title: const Text('Sudoku'),
+    actions: [
+      IconButton(
+        icon: Text(SudokuApp.of(context)?._currentLocale.languageCode.toUpperCase() ?? 'EN'),
+        onPressed: () {
+          var newLocale = Localizations.localeOf(context).languageCode == 'en'
+              ? Locale('no', '')
+              : Locale('en', '');
+          SudokuApp.of(context)?.setLocale(newLocale);
+        },
+      ),
+    ],
+  );
 }
